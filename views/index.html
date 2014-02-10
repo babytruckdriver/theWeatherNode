@@ -26,6 +26,7 @@
 
     <div class="cuerpo">
         <div class="entrada">
+            <!-- Mostrar un gif animado mientra se ejecuta la consulta Ajax-->
             <input id="localidad" type="text" placeholder="Localidad">
         </div>  
         
@@ -35,20 +36,6 @@
         
         <div id="forecast-container" class="oculto">
             
-            <div class="resultado tiempo-actual">
-                <ul>
-                    <li class="cabecera">Hoy</li>
-                    <li>
-                        <ul>
-                            <li><img class="imagen-actual imagen-reducida" src=""></li>
-                            <li>Temperatura: <span class="info temperatura"></span></li>
-                            <li>Estado: <span class="info estado"></span></li>
-                            <li>Precipitación: <span id="precipitacion" class="info"></span></li>
-                            <li>Velocidad del viento: <span id="velocidad-viento" class="info"></span></li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
             <div class="resultado tiempo-actual">
                 <ul>
                     <li class="cabecera"></li>
@@ -61,7 +48,7 @@
                             <li>Velocidad del viento: <span id="velocidad-viento0" class="info"></span></li>
                         </ul>
                     </li>
-                </ul>            
+                </ul>
             </div>
             <div class="resultado tiempo-actual">
                 <ul>
@@ -85,12 +72,25 @@
                             <li><img id="imagen2" class="imagen-reducida" src=""></li>
                             <li>Temperatura: <span id="temperatura2" class="info"></span></li>
                             <li>Estado: <span id="estado2" class="info"></span></li>
-                            <li>Cielo cubierto al <span id="cloud-cover2" class="info"></span></li>
                             <li>Precipitación: <span id="precipitacion2" class="info"></span></li>
                             <li>Velocidad del viento: <span id="velocidad-viento2" class="info"></span></li>
                         </ul>
                     </li>
                 </ul>            
+            </div>
+            <div class="resultado tiempo-actual">
+                <ul>
+                    <li class="cabecera"></li>
+                    <li>
+                        <ul>
+                            <li><img id="imagen3" class="imagen-reducida" src=""></li>
+                            <li>Temperatura: <span id="temperatura3" class="info"></span></li>
+                            <li>Estado: <span id="estado3" class="info"></span></li>
+                            <li>Precipitación: <span id="precipitacion3" class="info"></span></li>
+                            <li>Velocidad del viento: <span id="velocidad-viento3" class="info"></span></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
             <div class="clear"></div>
             
@@ -140,7 +140,8 @@
         //Busca las posibles localizaciones según el critério de búsqueda utilizado
         var getLocalidades = function (localidad) {
             //TODO Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
-            //EJ: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
+            //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
+            //ACtualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
             
             if(!ajaxInProgress) {
                 var targetUrl = "/location";
@@ -204,7 +205,7 @@
                 var datos = {
                     formato: "json",
                     localidad: $("#localidad").val(),
-                    numDias: 3
+                    numDias: 4
                 };
                 
                 ajaxInProgress = true;
@@ -253,18 +254,17 @@
             if(json.ok) {
                 //Si la respuesta no contiene errores
                 if(json.info.data.error === undefined) {
-                    //Carga del listado de datos
-                    //La temperatura debe ser mostrada en dos elementos diferentes >
-                    //jQuery selecciona conjuntos de elementos vía '.clase', pero no vía '#id'
+                    //Carga del tiempo actual
                     var temperatura = $(".temperatura").text(json.info.data.current_condition[0].temp_C + "Cº");  
                     $(".estado").text(json.info.data.current_condition[0].weatherDesc[0].value);
                      $(temperatura[0]).closest("div").show();
-                    $("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
-                    $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm"); 
-                    $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");
-                    
                     $(".localidad-temperatura").text(json.info.data.request[0].query);
                     
+                    //TODO utilizar los siguientes datos referentes al tiempo actual
+                    /*$("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
+                    $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm");
+                    $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");*/
+
                     //Carga de la imagen asociada al tiempo actual
                     var imagen = $(".imagen-actual");
                     imagen.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
@@ -280,17 +280,23 @@
                             //Mostrar fecha en formato España
                             var date = new Date(value.date);
                             var day = date.getDate();
-                            var month = date.getMonth();
+                            var month = date.getMonth() + 1;
                             var year = date.getFullYear();
+
+                            var fechaFormateada = day + "/" + month + "/" + year;
+                            var hoy = new Date();
                             
-                            $(cabeceras[key+1]).text(day + "/" + month + "/" + year);
+                            if((hoy.getDate() == day) && (hoy.getMonth() +1 == month) && (hoy.getFullYear() == year)) {
+                                fechaFormateada = "Hoy";
+                            }
+
+                            $(cabeceras[key]).text(fechaFormateada);
                             $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");  
                             $("#estado" + key).text(value.weatherDesc[0].value);
                             $("#precipitacion" + key).text(value.precipMM + "mm"); 
                             $("#velocidad-viento" + key).text(value.windspeedKmph + "Km/h");
                             var imagen = $("#imagen" + key);
-                            imagen.attr("src", value.weatherIconUrl[0].value);                            
-                            
+                            imagen.attr("src", value.weatherIconUrl[0].value);
                             
                         });
                     }

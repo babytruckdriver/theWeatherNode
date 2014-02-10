@@ -40,51 +40,12 @@ app.get('/', function (req, res) {
 
     //Para usar HTML estandar en vez de JADE
     res.sendfile ('views/index.html', {root:__dirname});
-
-    /* 
-    //Se crean algunos documentos para llenar la Base de Datos
-    var doc = new Document ({title: "La ladrona de libros"});
-    doc.save(function (err, doc) {
-        if(err) {
-            console.log("Error al grabar documento " + doc.title);
-        } else {
-            console.log("Documento guardado correctamente");
-        }
-    });
-   var doc2 = new Document ({title: "Dime quien soy"});
-    doc2.save(function (err, doc2) {
-        if(err) {
-            console.log("Error al grabar documento " + doc2.title);
-        } else {
-            console.log("Documento guardado correctamente");
-        }
-    });*/
-
-   /* Document.find(function (err, documents) {
-        if (err) {
-            console.log("Error al recuperar los documentos");
-        } else {
-            console.log("Consulta a la Base de Datos realizada correctamente");
-
-            //Para usar JADE
-            res.render('index.jade', {
-                locals: {
-                    documents: documents,
-                    title: "WetherNode"
-                }
-            });
-        }
-    });*/
 });
 
 
 
 app.get('/forecast.:formato?', function (req, res) {
     console.log("Petición /forecast con parámetro localidad=" + req.param("localidad"));
-    /*
-    //Busca todos los documentos de la base de datos
-    var documents = Document.find().all();
-    res.render('page1', { documents: documents});*/
 
     //Llamada al servicio Web 'local weather' de 'World Weather Online' (RESTFUL)
     var url = "http://api.worldweatheronline.com/free/v1/weather.ashx";
@@ -159,16 +120,12 @@ app.get('/forecast.:formato?', function (req, res) {
             
             res.json({ok: ok, info: json}); 
         });        
-    //EScuchador del evento 'error' de la request    
+    //Escuchador del evento 'error' de la request
     }).on('error', function (e) {
         console.log("Got error: " + e.message);
         ok = false;
         res.json({ok: ok, cod: 500}); 
     });
-    
-    /*res.render('page1', {
-        documents: documents
-    });*/
 
 });
 
@@ -234,7 +191,7 @@ app.get('/location', function (req, res) {
             
             res.json({ok: ok, info: json}); 
         });        
-    //EScuchador del evento 'error' de la request    
+    //Escuchador del evento 'error' de la request
     }).on('error', function (e) {
         console.log("Got error: " + e.message);
         ok = false;
