@@ -1,0 +1,20 @@
+h1= title
+p Welcome to #{title}
+p Nombre: 
+ = ' ' + documents[6].title
+a(href="/test?format=json") Query the BD!
+ul
+    - for (var i=0; i<documents.length; i++) {
+        li Nombre:
+         = ' ' + documents[i].title
+    - }
+        
+ul
+    - each document, i in documents
+        li= i + ' ' + document.title
+                
+script(src="javascripts/jquery-2.0.3.js")
+script.
+    $(document).ready(function () {
+        //TODO All the behavior here
+    });

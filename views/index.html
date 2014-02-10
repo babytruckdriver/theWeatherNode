@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>The WhetherNode</title>
+    <link rel="stylesheet" href="/stylesheets/style.css">
+</head>
+
+<body id="weatherNode">
+    
+    <div class="encabezado">
+        <h1><span class="title-detail-begin">El</span> Tiemp<span class="title-detail">o</span></h1>
+        <h2>(The WhetherNode)</h2>
+    </div>
+    <div class="encabezado derecha" style="backgrond: blue">
+        <div class="info oculto" >
+            <span class="localidad-temperatura"></span>
+            <span class="estado estado-temperatura"></span>
+            <span class="temperatura temperatura-temperatura"></span>
+        </div>
+    </div>
+    <div class="imagen-presente derecha">
+        <img class="imagen-actual" src="">
+    </div>
+    
+
+    <div class="cuerpo">
+        <div class="entrada">
+            <input id="localidad" type="text" placeholder="Localidad">
+        </div>  
+        
+        <div class="submitter-container">
+            <a href="#" id="getWeatherInfo" class="submitter">Información meteorológica para <span class="localidad">...</span></a>
+        </div>
+        
+        <div id="forecast-container" class="oculto">
+            
+            <div class="resultado tiempo-actual">
+                <ul>
+                    <li class="cabecera">Hoy</li>
+                    <li>
+                        <ul>
+                            <li><img class="imagen-actual imagen-reducida" src=""></li>
+                            <li>Temperatura: <span class="info temperatura"></span></li>
+                            <li>Estado: <span class="info estado"></span></li>
+                            <li>Precipitación: <span id="precipitacion" class="info"></span></li>
+                            <li>Velocidad del viento: <span id="velocidad-viento" class="info"></span></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="resultado tiempo-actual">
+                <ul>
+                    <li class="cabecera"></li>
+                    <li>
+                        <ul>
+                            <li><img id="imagen0" class="imagen-reducida" src=""></li>
+                            <li>Temperatura: <span id="temperatura0" class="info"></span></li>
+                            <li>Estado: <span id="estado0" class="info"></span></li>
+                            <li>Precipitación: <span id="precipitacion0" class="info"></span></li>
+                            <li>Velocidad del viento: <span id="velocidad-viento0" class="info"></span></li>
+                        </ul>
+                    </li>
+                </ul>            
+            </div>
+            <div class="resultado tiempo-actual">
+                <ul>
+                    <li class="cabecera"></li>
+                    <li>
+                        <ul>
+                            <li><img id="imagen1" class="imagen-reducida" src=""></li>
+                            <li>Temperatura: <span id="temperatura1" class="info"></span></li>
+                            <li>Estado: <span id="estado1" class="info"></span></li>
+                            <li>Precipitación: <span id="precipitacion1" class="info"></span></li>
+                            <li>Velocidad del viento: <span id="velocidad-viento1" class="info"></span></li>
+                        </ul>
+                    </li>
+                </ul>            
+            </div>
+            <div class="resultado tiempo-actual">
+                <ul>
+                    <li class="cabecera"></li>
+                    <li>
+                        <ul>
+                            <li><img id="imagen2" class="imagen-reducida" src=""></li>
+                            <li>Temperatura: <span id="temperatura2" class="info"></span></li>
+                            <li>Estado: <span id="estado2" class="info"></span></li>
+                            <li>Cielo cubierto al <span id="cloud-cover2" class="info"></span></li>
+                            <li>Precipitación: <span id="precipitacion2" class="info"></span></li>
+                            <li>Velocidad del viento: <span id="velocidad-viento2" class="info"></span></li>
+                        </ul>
+                    </li>
+                </ul>            
+            </div>
+            <div class="clear"></div>
+            
+        </div>
+        
+        <div id="error-container" class="oculto"></div>
+        <div id="validaciones-container" class="oculto"></div>
+    </div>
+    
+    
+    <!--<div id="todo">
+    </div>
+    <script type="text/template" id="item-template">
+        <div>
+          <input id="todo_complete" type="checkbox" <%= completed ? 'checked="checked"' : '' %> />
+          <%= title %>
+        </div>
+    </script>-->
+    <script src="javascripts/jquery-2.0.3.js"></script>
+    <!--<script src="javascripts/underscore.js"></script>
+    <script src="javascripts/backbone.js"></script>
+    <script src="javascripts/clientApp.js"></script>-->
+    <script>
+        /** 
+        Funciones propias de la aplicación (Single Page Application)
+        */
+        
+        //La variable informa si hay una petición Ajax en proceso
+        var ajaxInProgress = false;
+        
+        //Muestra mensajes de validación
+        var muestraValidaciones = function (arrValidaciones) {
+            //La información meteorológica anteriormente cargada se esconde
+            $("#forecast-container").hide();
+            $("#imagen").hide();
+            
+            var validacionesContainer = $("#validaciones-container"); 
+            validacionesContainer.html("<span class='centrado'>" + arrValidaciones[0] + "<span>"); 
+            
+            if(validacionesContainer.is(":visible")) {
+                validacionesContainer.slideUp(200).delay(200).slideDown(200);
+            } else {
+                validacionesContainer.slideDown(200);
+            }
+        };
+        
+        //Busca las posibles localizaciones según el critério de búsqueda utilizado
+        var getLocalidades = function (localidad) {
+            //TODO Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
+            //EJ: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
+            
+            if(!ajaxInProgress) {
+                var targetUrl = "/location";
+                
+                //Objecto con los datos de entrada de la petición
+                var datos = {
+                    formato: "json",
+                    localidad: $(localidad).val()
+                };
+                
+                ajaxInProgress = true;    
+                
+                //Configuración y llamada al servicio RESTful vía Ajax
+                $.ajax({
+                    url: targetUrl, 
+                    data: datos,
+                    type: "GET",
+                    dataType: "json",
+                    cache: false,
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
+                    success: printLocationHelper,
+                    error: errorHandle,
+                    //Función que se ejecuta sin importar el resultado de la petición Ajax
+                    //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                    complete: function () {
+                        console.log("Petición Ajax realizada.");
+                        ajaxInProgress = false;   
+                    }
+                });                
+            }
+        };
+        
+        //Muestra las posibles localizaciones según el critério de búsqueda utilizado
+        var printLocationHelper = function(json) {
+            //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
+            if(json.ok) {
+                //Si la respuesta no contiene errores
+                if(json.info.data == undefined) {
+                    //TODO hacer algo con los resultados obtenidos de buscar localidades según se va escribiendo
+                    //json.info.search_api.result[0].areaName[0].value);
+                } else {
+                    //No se encuentran localidades con los datoa introducidos.
+                    //Este error no se maneja (ni muestra)
+                }
+            } else {
+                //Ha habido algún problema en el servidor.
+                //Este error no se maneja (ni muestra)
+            }
+        };
+
+        //Recupera la información meteorológica para la localización introducida
+        var getWeatherInfo = function () {
+            console.log("Intentando realizar petición Ajax...");
+            //Si no hay una petición Ajax en curso se realiza una
+            if(!ajaxInProgress) {
+                console.log("Realizando petición Ajax...");
+                //URL del servicio RESTful del Backend de la aplicación
+                var targetUrl = "/forecast";
+                
+                //Objecto con los datos de entrada de la petición
+                var datos = {
+                    formato: "json",
+                    localidad: $("#localidad").val(),
+                    numDias: 3
+                };
+                
+                ajaxInProgress = true;
+                
+                //Configuración y llamada al servicio RESTful vía Ajax
+                $.ajax({
+                    url: targetUrl, 
+                    data: datos,
+                    type: "GET",
+                    dataType: "json",
+                    cache: false,
+                    contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
+                    success: printWeather,
+                    error: errorHandle,
+                    //Función que se ejecuta sin importar el resultado de la petición Ajax
+                    //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                    complete: function () {
+                        console.log("Petición Ajax realizada.");
+                        ajaxInProgress = false;   
+                    }
+                });
+            }
+        };
+        
+        //Maneja los errores de la petición Ajax
+        //err = { cod, desc }
+        var errorHandle = function (err) {
+            //La información meteorológica anteriormente cargada se oculta
+            $("#forecast-container").hide();
+            $("#imagen").hide();
+            
+            var errorContainer = $("#error-container");
+            var errorMsg = err.statusText +
+                "\n Error " + err.status;
+            
+            console.log(errorMsg);
+            
+            errorContainer.html(errorMsg);
+            errorContainer.slideDown(200).delay(3000).slideUp(2000);
+        };
+        
+        //Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
+        //Muestra en pantalla la información meteorológica
+        var printWeather = function (json) {  
+            //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
+            if(json.ok) {
+                //Si la respuesta no contiene errores
+                if(json.info.data.error === undefined) {
+                    //Carga del listado de datos
+                    //La temperatura debe ser mostrada en dos elementos diferentes >
+                    //jQuery selecciona conjuntos de elementos vía '.clase', pero no vía '#id'
+                    var temperatura = $(".temperatura").text(json.info.data.current_condition[0].temp_C + "Cº");  
+                    $(".estado").text(json.info.data.current_condition[0].weatherDesc[0].value);
+                     $(temperatura[0]).closest("div").show();
+                    $("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
+                    $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm"); 
+                    $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");
+                    
+                    $(".localidad-temperatura").text(json.info.data.request[0].query);
+                    
+                    //Carga de la imagen asociada al tiempo actual
+                    var imagen = $(".imagen-actual");
+                    imagen.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
+                    
+                    
+                    //Presentación de la previsión meteorológica (diferentes de temperatura actual)
+                    var jsonForecast = json.info.data.weather;
+                    var cabeceras = $(".cabecera");
+                    
+                    if(jsonForecast !== undefined) {
+                        $.each(jsonForecast, function (key, value) {
+                            
+                            //Mostrar fecha en formato España
+                            var date = new Date(value.date);
+                            var day = date.getDate();
+                            var month = date.getMonth();
+                            var year = date.getFullYear();
+                            
+                            $(cabeceras[key+1]).text(day + "/" + month + "/" + year);
+                            $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");  
+                            $("#estado" + key).text(value.weatherDesc[0].value);
+                            $("#precipitacion" + key).text(value.precipMM + "mm"); 
+                            $("#velocidad-viento" + key).text(value.windspeedKmph + "Km/h");
+                            var imagen = $("#imagen" + key);
+                            imagen.attr("src", value.weatherIconUrl[0].value);                            
+                            
+                            
+                        });
+                    }
+                    
+                    
+                    //Animación para la presentación del listado de datos y la imagen
+                    var forecastContainer = $("#forecast-container");
+                    if(forecastContainer.is(":visible")) {
+                        $("#forecast-container").slideUp(200).delay(200).slideDown(1000);
+                        imagen.hide().slideDown("1000");
+                    } else {
+                        $("#forecast-container").slideDown(1000);
+                        imagen.hide().slideDown("1000");
+                    }
+                } else {
+                    //Se pasa el error a la función manejadora de errores
+                    errorHandle({statusText: json.info.data.error[0].msg, status: 200});  
+                }
+            } else {
+                errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});   
+            }
+        };
+        
+    </script>
+    <script>
+        $(document).ready(function () {
+            //Poner el foco en el primer elemento visible
+            $("body").find("input[type=text]:visible:first").focus();
+            
+            //Al clicar el botón se consulta el tiempo para la localidad indicada
+            $("#getWeatherInfo").on("click", function () {
+                console.log("Información meteorológica requerida..");
+                
+                //Validaciones sobre los campos de entrada
+                var erroresEntrada = false;
+                if(!$("#localidad").val()) {
+                    muestraValidaciones(["Es necesario especificar una localidad"]); 
+                    $("#localidad").focus();
+                    $("#localidad").addClass("error-input");
+                    erroresEntrada = true;
+                }
+                
+                if(!erroresEntrada) {
+                    $("#validaciones-container").hide();
+                    getWeatherInfo();
+                }
+            });
+            
+            $("#localidad").on("keyup", function (event) {
+                //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
+                $("#localidad").removeClass("error-input");
+                
+                //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
+                if(event.keyCode === 13) {
+                    $("#getWeatherInfo").click();  
+                    return true;
+                }
+                
+                var txtLocalidad = $(".localidad");
+                txtLocalidad.text($(this).val());
+                
+                //Si el campo está vacío
+                if(!$(this).val()) {
+                    txtLocalidad.text("...");   
+                }
+                
+                //Si se han introducido más de 3 caracteres se procede a buscar localidades
+                //que coincidan con esos caracteres
+                //TODO Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
+                /*if($(this).val().length >= 4) {
+                    getLocalidades(this);
+                }*/
+            });
+            
+            //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
+            $("#localidad").on("click", function () {
+                $("#localidad").removeClass("error-input");
+            });
+        });
+    </script>
+</body>
+
+</html>
