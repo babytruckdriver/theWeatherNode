@@ -33,7 +33,26 @@ app.configure('production', function () {
     app.use(express.errorHandler());
 });
 
+
+// Métodos y objetos de uso común
+
+
+//Función que serializa los atributos de 'this' en formato 'queryString' ( &nomAttr=valor&... ).
+//Uso: Ejecutar la función 'stringify'haciendo 'apply' y pasándole el "this" sobre el que actuar (un objeto con datos)
+app.stringify = function () {
+    var name, result = "";
+    //La función acepta 'this' con funciones, pero no las tiene en cuenta
+    for (name in this) {
+        if (typeof this[name] !== "function" && this.hasOwnProperty(name)) {
+            result += "&" + name + "=" + this[name];
+        }
+    }
+    return result;
+};
+
+
 // Routes
+
 
 app.get('/', function (req, res) {
     console.log("Aplicación iniciada correctamente.");
@@ -42,8 +61,6 @@ app.get('/', function (req, res) {
     res.sendfile ('views/index.html', {root:__dirname});
 });
 
-
-
 app.get('/forecast.:formato?', function (req, res) {
     console.log("Petición /forecast con parámetro localidad=" + req.param("localidad"));
 
@@ -51,26 +68,16 @@ app.get('/forecast.:formato?', function (req, res) {
     var url = "http://api.worldweatheronline.com/free/v1/weather.ashx";
     var key = "4g6yp8teksrqzy6rfykh6c24";
     
-    //Objeto donde centralizar todos los datos de entrada de la petición
-    var frontRequestData = {
+    //Datos de entrada de la petición agrupados en un objeto
+    var data = {
         format: req.param("formato"),
         q: req.param("localidad"), //localidad
         num_of_days: req.param("numDias"),
-        //Función que serializa en formato QueryString los atributos del objeto
-        stringify: function () {
-            var name, result = "";
-            for (name in this) {
-                if (typeof this[name] !== "function" && this.hasOwnProperty(name)) {
-                    result += "&" + name + "=" + this[name];
-                }
-            }
-            return result;
-        }
     };
 
     //Configurando el enPoint
     var endPoint = url + "?key=" + key;
-    endPoint += frontRequestData.stringify();
+    endPoint += app.stringify.apply(data);
 
     console.log("Final EndPoint: " + endPoint);
 
