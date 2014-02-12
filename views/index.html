@@ -12,17 +12,18 @@
         <h1><span class="title-detail-begin">El</span> Tiemp<span class="title-detail">o</span></h1>
         <h2>(The WhetherNode)</h2>
     </div>
-    <div class="encabezado derecha" style="backgrond: blue">
-        <div class="info oculto" >
-            <span class="localidad-temperatura"></span>
-            <span class="estado estado-temperatura"></span>
-            <span class="temperatura temperatura-temperatura"></span>
+    <div id="condicionesActuales" class="oculto">
+        <div class="encabezado derecha">
+            <div class="info oculto" >
+                <span class="localidad-temperatura"></span>
+                <span class="estado estado-temperatura"></span>
+                <span class="temperatura temperatura-temperatura"></span>
+            </div>
+        </div>
+        <div class="imagen-presente derecha">
+            <img class="imagen-actual" src="">
         </div>
     </div>
-    <div class="imagen-presente derecha">
-        <img class="imagen-actual" src="">
-    </div>
-    
 
     <div class="cuerpo">
         <div class="entrada">
@@ -103,19 +104,8 @@
         <div id="validaciones-container" class="oculto"></div>
     </div>
     
-    
-    <!--<div id="todo">
-    </div>
-    <script type="text/template" id="item-template">
-        <div>
-          <input id="todo_complete" type="checkbox" <%= completed ? 'checked="checked"' : '' %> />
-          <%= title %>
-        </div>
-    </script>-->
+
     <script src="javascripts/jquery-2.0.3.js"></script>
-    <!--<script src="javascripts/underscore.js"></script>
-    <script src="javascripts/backbone.js"></script>
-    <script src="javascripts/clientApp.js"></script>-->
     <script>
         /** 
         Funciones propias de la aplicación (Single Page Application)
@@ -128,7 +118,7 @@
         var muestraValidaciones = function (arrValidaciones) {
             //La información meteorológica anteriormente cargada se esconde
             $("#forecast-container").hide();
-            $("#imagen").hide();
+            $("#condicionesActuales").hide();
             
             var validacionesContainer = $("#validaciones-container"); 
             validacionesContainer.html("<span class='centrado'>" + arrValidaciones[0] + "<span>"); 
@@ -214,6 +204,7 @@
                 };
                 
                 ajaxInProgress = true;
+                $("#indicadorAjaxEnCurso").show();
                 
                 //Configuración y llamada al servicio RESTful vía Ajax
                 $.ajax({
@@ -230,6 +221,7 @@
                     complete: function () {
                         console.log("Petición Ajax realizada.");
                         ajaxInProgress = false;   
+                        $("#indicadorAjaxEnCurso").hide();
                     }
                 });
             }
@@ -240,7 +232,7 @@
         var errorHandle = function (err) {
             //La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
             $("#forecast-container").hide();
-            $("#imagen").hide();
+            $("#condicionesActuales").hide();
             var errorContainer = $("#error-container");
             errorContainer.hide();
 
@@ -270,8 +262,9 @@
                     $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");*/
 
                     //Carga de la imagen asociada al tiempo actual
-                    var imagen = $(".imagen-actual");
-                    imagen.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
+                    var imagenActual = $(".imagen-actual");
+                    imagenActual.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
+
                     
                     
                     //Presentación de la previsión meteorológica (diferentes de temperatura actual)
@@ -310,10 +303,10 @@
                     var forecastContainer = $("#forecast-container");
                     if(forecastContainer.is(":visible")) {
                         $("#forecast-container").slideUp(200).delay(200).slideDown(1000);
-                        imagen.hide().slideDown("1000");
+                        $("#condicionesActuales").hide().slideDown("1000");
                     } else {
                         $("#forecast-container").slideDown(1000);
-                        imagen.hide().slideDown("1000");
+                        $("#condicionesActuales").hide().slideDown("1000");
                     }
                 } else {
                     //Se pasa el error a la función manejadora de errores
