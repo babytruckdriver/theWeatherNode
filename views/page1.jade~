@@ -1,5 +1,0 @@
-h1= title
-p This is the result of the Query: 
-span#result #{documents}
-a(href="/") < Go back
-
