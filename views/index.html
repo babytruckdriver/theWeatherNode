@@ -28,6 +28,9 @@
         <div class="entrada">
             <!-- Mostrar un gif animado mientra se ejecuta la consulta Ajax-->
             <input id="localidad" type="text" placeholder="Localidad">
+            <span id="indicadorAjaxEnCurso" class="oculto">
+                <img src="/images/ajax-loader.gif">
+            </span>
         </div>  
         
         <div class="submitter-container">
@@ -152,8 +155,9 @@
                     localidad: $(localidad).val()
                 };
                 
-                ajaxInProgress = true;    
-                
+                ajaxInProgress = true;
+                $("#indicadorAjaxEnCurso").show();
+                setTimeout(1000);
                 //Configuración y llamada al servicio RESTful vía Ajax
                 $.ajax({
                     url: targetUrl, 
@@ -169,6 +173,7 @@
                     complete: function () {
                         console.log("Petición Ajax realizada.");
                         ajaxInProgress = false;   
+                        $("#indicadorAjaxEnCurso").hide();
                     }
                 });                
             }
@@ -233,16 +238,15 @@
         //Maneja los errores de la petición Ajax
         //err = { cod, desc }
         var errorHandle = function (err) {
-            //La información meteorológica anteriormente cargada se oculta
+            //La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
             $("#forecast-container").hide();
             $("#imagen").hide();
-            
             var errorContainer = $("#error-container");
+            errorContainer.hide();
+
             var errorMsg = err.statusText +
                 "\n Error " + err.status;
-            
-            console.log(errorMsg);
-            
+
             errorContainer.html(errorMsg);
             errorContainer.slideDown(200).delay(3000).slideUp(2000);
         };
