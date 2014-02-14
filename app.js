@@ -38,7 +38,8 @@ app.configure('production', function () {
 
 
 //Función que serializa los atributos de 'this' en formato 'queryString' ( &nomAttr=valor&... ).
-//Uso: Ejecutar la función 'stringify'haciendo 'apply' y pasándole el "this" sobre el que actuar (un objeto con datos)
+//Uso:  -Ejecutar la función 'app.stringify'haciendo 'apply' y pasándole el "this" sobre el que actuar (un objeto con datos): app.stringify.apply(data)
+//      -También se puede asociar la función 'stringify' de 'app' al objeto que necesite hacer uso de ella: data.stringify = app.stringify -> data.stringify()
 app.stringify = function () {
     var name, result = "";
     //La función acepta 'this' con funciones, pero no las tiene en cuenta
@@ -74,13 +75,16 @@ app.get('/forecast.:formato?', function (req, res) {
         q: req.param("localidad"), //localidad
         num_of_days: req.param("numDias"),
     };
+    //Añadimos al objeto 'data' la función 'app.stringify' que trabaja sobre 'this'
+    data.stringify = app.stringify;
 
     //Configurando el enPoint
     var endPoint = url + "?key=" + key;
-    endPoint += app.stringify.apply(data);
+    endPoint += data.stringify();
 
     console.log("Final EndPoint: " + endPoint);
 
+    //Conexión al Servicio Web externo vía proxy
     var username = 'essamu';
     var password = '00==AAaa00==AAaa';
     var host = "10.43.21.27";
@@ -98,7 +102,7 @@ app.get('/forecast.:formato?', function (req, res) {
 
     //TODO Cachear respuesta (la información del servicio se actualiza cada 3,4 horas)
     //Realiza conexión con el servicio Web
-    http.get(endPoint , function (response) {
+    http.get(options , function (response) {
         var ok = true;
         response.setEncoding('utf-8');
         var statusCode = response.statusCode;

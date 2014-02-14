@@ -107,12 +107,76 @@
 
     <script src="javascripts/jquery-2.0.3.js"></script>
     <script>
-        /** 
-        Funciones propias de la aplicación (Single Page Application)
-        */
-        
-        //La variable informa si hay una petición Ajax en proceso
-        var ajaxInProgress = false;
+        //Objeto contenedor de la aplicación JavaScript
+        var app = {
+            //La propiedad informa si hay una petición Ajax en proceso
+            ajaxInProgress: false,
+
+            onReady: function () {
+                //TODO Por alguna razón en este punto 'this' hace referencia a 'document' en vez de al objeto 'app'
+                //por lo que para acceder a las propiedades y métodos del objeto se debe utilizar como prefijo su nombre y no 'this'. ?¿?¿?
+                var name = "";
+                for(name in this) {
+                    console.log(">"+name);
+                }
+
+                //Poner el foco en el primer elemento visible
+                $("body").find("input[type=text]:visible:first").focus();
+
+                //Al clicar el botón se consulta el tiempo para la localidad indicada
+                $("#getWeatherInfo").on("click", this.eventWeatherInfo);
+
+                $("#localidad").on("keyup", this.eventLocalidad);
+
+                //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
+                $("#localidad").on("click", function () {
+                    $("#localidad").removeClass("error-input");
+                });
+
+            },
+
+            eventWeatherInfo: function (event) {
+                //Validaciones sobre los campos de entrada
+                var erroresEntrada = false;
+                if(!$("#localidad").val()) {
+                    muestraValidaciones(["Es necesario especificar una localidad"]);
+                    $("#localidad").focus();
+                    $("#localidad").addClass("error-input");
+                    erroresEntrada = true;
+                }
+
+                if(!erroresEntrada) {
+                    $("#validaciones-container").hide();
+                    getWeatherInfo();
+                }
+            },
+
+            eventLocalidad: function (event) {
+                //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
+                $("#localidad").removeClass("error-input");
+
+                //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
+                if(event.keyCode === 13) {
+                    $("#getWeatherInfo").click();
+                    return true;
+                }
+
+                var txtLocalidad = $(".localidad");
+                txtLocalidad.text($(this).val());
+
+                //Si el campo está vacío
+                if(!$(this).val()) {
+                    txtLocalidad.text("...");
+                }
+
+                //Si se han introducido más de 3 caracteres se procede a buscar localidades
+                //que coincidan con esos caracteres
+                //TODO Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
+                //if($(this).val().length >= 4) {
+                //    getLocalidades(this);
+                //}
+            }
+        };
         
         //Muestra mensajes de validación
         var muestraValidaciones = function (arrValidaciones) {
@@ -136,7 +200,7 @@
             //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
             //ACtualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
             
-            if(!ajaxInProgress) {
+            if(!app.ajaxInProgress) {
                 var targetUrl = "/location";
                 
                 //Objecto con los datos de entrada de la petición
@@ -145,7 +209,7 @@
                     localidad: $(localidad).val()
                 };
                 
-                ajaxInProgress = true;
+                app.ajaxInProgress = true;
                 $("#indicadorAjaxEnCurso").show();
                 setTimeout(1000);
                 //Configuración y llamada al servicio RESTful vía Ajax
@@ -162,7 +226,7 @@
                     //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
                     complete: function () {
                         console.log("Petición Ajax realizada.");
-                        ajaxInProgress = false;   
+                        app.ajaxInProgress = false;
                         $("#indicadorAjaxEnCurso").hide();
                     }
                 });                
@@ -191,7 +255,7 @@
         var getWeatherInfo = function () {
             console.log("Intentando realizar petición Ajax...");
             //Si no hay una petición Ajax en curso se realiza una
-            if(!ajaxInProgress) {
+            if(!app.ajaxInProgress) {
                 console.log("Realizando petición Ajax...");
                 //URL del servicio RESTful del Backend de la aplicación
                 var targetUrl = "/forecast";
@@ -203,7 +267,7 @@
                     numDias: 4
                 };
                 
-                ajaxInProgress = true;
+                app.ajaxInProgress = true;
                 $("#indicadorAjaxEnCurso").show();
                 
                 //Configuración y llamada al servicio RESTful vía Ajax
@@ -220,7 +284,7 @@
                     //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
                     complete: function () {
                         console.log("Petición Ajax realizada.");
-                        ajaxInProgress = false;   
+                        app.ajaxInProgress = false;
                         $("#indicadorAjaxEnCurso").hide();
                     }
                 });
@@ -317,62 +381,7 @@
             }
         };
         
-    </script>
-    <script>
-        $(document).ready(function () {
-            //Poner el foco en el primer elemento visible
-            $("body").find("input[type=text]:visible:first").focus();
-            
-            //Al clicar el botón se consulta el tiempo para la localidad indicada
-            $("#getWeatherInfo").on("click", function () {
-                console.log("Información meteorológica requerida..");
-                
-                //Validaciones sobre los campos de entrada
-                var erroresEntrada = false;
-                if(!$("#localidad").val()) {
-                    muestraValidaciones(["Es necesario especificar una localidad"]); 
-                    $("#localidad").focus();
-                    $("#localidad").addClass("error-input");
-                    erroresEntrada = true;
-                }
-                
-                if(!erroresEntrada) {
-                    $("#validaciones-container").hide();
-                    getWeatherInfo();
-                }
-            });
-            
-            $("#localidad").on("keyup", function (event) {
-                //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
-                $("#localidad").removeClass("error-input");
-                
-                //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
-                if(event.keyCode === 13) {
-                    $("#getWeatherInfo").click();  
-                    return true;
-                }
-                
-                var txtLocalidad = $(".localidad");
-                txtLocalidad.text($(this).val());
-                
-                //Si el campo está vacío
-                if(!$(this).val()) {
-                    txtLocalidad.text("...");   
-                }
-                
-                //Si se han introducido más de 3 caracteres se procede a buscar localidades
-                //que coincidan con esos caracteres
-                //TODO Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
-                /*if($(this).val().length >= 4) {
-                    getLocalidades(this);
-                }*/
-            });
-            
-            //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
-            $("#localidad").on("click", function () {
-                $("#localidad").removeClass("error-input");
-            });
-        });
+        $(document).ready(app.onReady.apply(app));
     </script>
 </body>
 
