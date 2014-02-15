@@ -112,21 +112,19 @@
             //La propiedad informa si hay una petición Ajax en proceso
             ajaxInProgress: false,
 
+            //Listeners
             onReady: function () {
                 //TODO Por alguna razón en este punto 'this' hace referencia a 'document' en vez de al objeto 'app'
                 //por lo que para acceder a las propiedades y métodos del objeto se debe utilizar como prefijo su nombre y no 'this'. ?¿?¿?
-                var name = "";
-                for(name in this) {
-                    console.log(">"+name);
-                }
+                //Como yo quiero usar 'this' he invocado a esta función, 'onReady', mediante 'apply()': app.onReady.apply(app)
 
                 //Poner el foco en el primer elemento visible
                 $("body").find("input[type=text]:visible:first").focus();
 
                 //Al clicar el botón se consulta el tiempo para la localidad indicada
-                $("#getWeatherInfo").on("click", this.eventWeatherInfo);
+                $("#getWeatherInfo").on("click", app.eventsHandlers.eventWeatherInfo);
 
-                $("#localidad").on("keyup", this.eventLocalidad);
+                $("#localidad").on("keyup", app.eventsHandlers.eventLocalidad);
 
                 //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
                 $("#localidad").on("click", function () {
@@ -135,70 +133,207 @@
 
             },
 
-            eventWeatherInfo: function (event) {
-                //Validaciones sobre los campos de entrada
-                var erroresEntrada = false;
-                if(!$("#localidad").val()) {
-                    muestraValidaciones(["Es necesario especificar una localidad"]);
-                    $("#localidad").focus();
-                    $("#localidad").addClass("error-input");
-                    erroresEntrada = true;
-                }
+            //Manejadores de eventos
+            eventsHandlers: {
 
-                if(!erroresEntrada) {
-                    $("#validaciones-container").hide();
-                    getWeatherInfo();
+                eventWeatherInfo: function (event) {
+                    //Validaciones sobre los campos de entrada
+                    var erroresEntrada = false;
+                    if(!$("#localidad").val()) {
+                        app.domManipulation.muestraValidaciones(["Es necesario especificar una localidad"]);
+                        $("#localidad").focus();
+                        $("#localidad").addClass("error-input");
+                        erroresEntrada = true;
+                    }
+
+                    if(!erroresEntrada) {
+                        $("#validaciones-container").hide();
+                        app.domManipulation.getWeatherInfo();
+                    }
+                },
+
+                eventLocalidad: function (event) {
+                    //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
+                    $("#localidad").removeClass("error-input");
+
+                    //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
+                    if(event.keyCode === 13) {
+                        $("#getWeatherInfo").click();
+                        return true;
+                    }
+
+                    var txtLocalidad = $(".localidad");
+                    txtLocalidad.text($(this).val());
+
+                    //Si el campo está vacío
+                    if(!$(this).val()) {
+                        txtLocalidad.text("...");
+                    }
+
+                    //Si se han introducido más de 3 caracteres se procede a buscar localidades
+                    //que coincidan con esos caracteres
+                    //TODO Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
+                    /*if($(this).val().length >= 4) {
+                        getLocalidades(this);
+                    }*/
                 }
             },
+            
+            //Métodos de acceso y manipulación del DOM
+            domManipulation: {
 
-            eventLocalidad: function (event) {
-                //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
-                $("#localidad").removeClass("error-input");
+                //Muestra mensajes de validación
+                muestraValidaciones: function (arrValidaciones) {
+                    //La información meteorológica anteriormente cargada se esconde
+                    $("#forecast-container").hide();
+                    $("#condicionesActuales").hide();
 
-                //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
-                if(event.keyCode === 13) {
-                    $("#getWeatherInfo").click();
-                    return true;
-                }
+                    var validacionesContainer = $("#validaciones-container");
+                    validacionesContainer.html("<span class='centrado'>" + arrValidaciones[0] + "<span>");
 
-                var txtLocalidad = $(".localidad");
-                txtLocalidad.text($(this).val());
+                    if(validacionesContainer.is(":visible")) {
+                        validacionesContainer.slideUp(200).delay(200).slideDown(200);
+                    } else {
+                        validacionesContainer.slideDown(200);
+                    }
+                },
 
-                //Si el campo está vacío
-                if(!$(this).val()) {
-                    txtLocalidad.text("...");
-                }
+                //Maneja los errores de la petición Ajax
+                //err = { cod, desc }
+                errorHandle: function (err) {
+                    //La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
+                    $("#forecast-container").hide();
+                    $("#condicionesActuales").hide();
+                    var errorContainer = $("#error-container");
+                    errorContainer.hide();
 
-                //Si se han introducido más de 3 caracteres se procede a buscar localidades
-                //que coincidan con esos caracteres
-                //TODO Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
-                //if($(this).val().length >= 4) {
-                //    getLocalidades(this);
-                //}
+                    var errorMsg = err.statusText +
+                        "\n Error " + err.status;
+
+                    errorContainer.html(errorMsg);
+                    errorContainer.slideDown(200).delay(3000).slideUp(2000);
+                },
+            
+                //Recupera la información meteorológica para la localización introducida
+                getWeatherInfo: function () {
+                    //Si no hay una petición Ajax en curso se realiza una
+                    if(!app.ajaxInProgress) {
+                        //URL del servicio RESTful del Backend de la aplicación
+                        var targetUrl = "/forecast";
+
+                        //Objecto con los datos de entrada de la petición
+                        var datos = {
+                            formato: "json",
+                            localidad: $("#localidad").val(),
+                            numDias: 4
+                        };
+
+                        app.ajaxInProgress = true;
+                        $("#indicadorAjaxEnCurso").show();
+
+                        //Configuración y llamada al servicio RESTful vía Ajax
+                        $.ajax({
+                            url: targetUrl,
+                            data: datos,
+                            type: "GET",
+                            dataType: "json",
+                            cache: false,
+                            contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
+                            success: app.domManipulation.printWeather,
+                            error: app.domManipulation.errorHandle,
+                            //Función que se ejecuta sin importar el resultado de la petición Ajax
+                            //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                            complete: function () {
+                                app.ajaxInProgress = false;
+                                $("#indicadorAjaxEnCurso").hide();
+                            }
+                        });
+                    }// Fin if
+                }, //Fin método
+
+                //Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
+                //Muestra en pantalla la información meteorológica
+                printWeather: function (json) {
+                    //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
+                    if(json.ok) {
+                        //Si la respuesta no contiene errores
+                        if(json.info.data.error === undefined) {
+                            //Carga del tiempo actual
+                            var temperatura = $(".temperatura").text(json.info.data.current_condition[0].temp_C + "Cº");
+                            $(".estado").text(json.info.data.current_condition[0].weatherDesc[0].value);
+                             $(temperatura[0]).closest("div").show();
+                            $(".localidad-temperatura").text(json.info.data.request[0].query);
+
+                            //TODO utilizar los siguientes datos referentes al tiempo actual
+                            /*$("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
+                            $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm");
+                            $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");*/
+
+                            //Carga de la imagen asociada al tiempo actual
+                            var imagenActual = $(".imagen-actual");
+                            imagenActual.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
+
+
+
+                            //Presentación de la previsión meteorológica (diferentes de temperatura actual)
+                            var jsonForecast = json.info.data.weather;
+                            var cabeceras = $(".cabecera");
+
+                            if(jsonForecast !== undefined) {
+                                $.each(jsonForecast, function (key, value) {
+
+                                    //Mostrar fecha en formato España
+                                    var date = new Date(value.date);
+                                    var day = date.getDate();
+                                    var month = date.getMonth() + 1;
+                                    var year = date.getFullYear();
+
+                                    var fechaFormateada = day + "/" + month + "/" + year;
+                                    var hoy = new Date();
+
+                                    if((hoy.getDate() == day) && (hoy.getMonth() +1 == month) && (hoy.getFullYear() == year)) {
+                                        fechaFormateada = "Hoy";
+                                    }
+
+                                    $(cabeceras[key]).text(fechaFormateada);
+                                    $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");
+                                    $("#estado" + key).text(value.weatherDesc[0].value);
+                                    $("#precipitacion" + key).text(value.precipMM + "mm");
+                                    $("#velocidad-viento" + key).text(value.windspeedKmph + "Km/h");
+                                    var imagen = $("#imagen" + key);
+                                    imagen.attr("src", value.weatherIconUrl[0].value);
+
+                                });
+                            }
+
+
+                            //Animación para la presentación del listado de datos y la imagen
+                            var forecastContainer = $("#forecast-container");
+                            if(forecastContainer.is(":visible")) {
+                                $("#forecast-container").slideUp(200).delay(200).slideDown(1000);
+                                $("#condicionesActuales").hide().slideDown("1000");
+                            } else {
+                                $("#forecast-container").slideDown(1000);
+                                $("#condicionesActuales").hide().slideDown("1000");
+                            }
+                        } else {
+                            //Se pasa el error a la función manejadora de errores
+                            app.domManipulation.errorHandle({statusText: json.info.data.error[0].msg, status: 200});
+                        }
+                    } else {
+                        app.domManipulation.errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});
+                    }
+                } //fin método
+
             }
         };
-        
-        //Muestra mensajes de validación
-        var muestraValidaciones = function (arrValidaciones) {
-            //La información meteorológica anteriormente cargada se esconde
-            $("#forecast-container").hide();
-            $("#condicionesActuales").hide();
-            
-            var validacionesContainer = $("#validaciones-container"); 
-            validacionesContainer.html("<span class='centrado'>" + arrValidaciones[0] + "<span>"); 
-            
-            if(validacionesContainer.is(":visible")) {
-                validacionesContainer.slideUp(200).delay(200).slideDown(200);
-            } else {
-                validacionesContainer.slideDown(200);
-            }
-        };
+
         
         //Busca las posibles localizaciones según el critério de búsqueda utilizado
-        var getLocalidades = function (localidad) {
+       /* var getLocalidades = function (localidad) {
             //TODO Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
             //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
-            //ACtualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
+            //Actualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
             
             if(!app.ajaxInProgress) {
                 var targetUrl = "/location";
@@ -249,139 +384,9 @@
                 //Ha habido algún problema en el servidor.
                 //Este error no se maneja (ni muestra)
             }
-        };
+        };*/
 
-        //Recupera la información meteorológica para la localización introducida
-        var getWeatherInfo = function () {
-            console.log("Intentando realizar petición Ajax...");
-            //Si no hay una petición Ajax en curso se realiza una
-            if(!app.ajaxInProgress) {
-                console.log("Realizando petición Ajax...");
-                //URL del servicio RESTful del Backend de la aplicación
-                var targetUrl = "/forecast";
-                
-                //Objecto con los datos de entrada de la petición
-                var datos = {
-                    formato: "json",
-                    localidad: $("#localidad").val(),
-                    numDias: 4
-                };
-                
-                app.ajaxInProgress = true;
-                $("#indicadorAjaxEnCurso").show();
-                
-                //Configuración y llamada al servicio RESTful vía Ajax
-                $.ajax({
-                    url: targetUrl, 
-                    data: datos,
-                    type: "GET",
-                    dataType: "json",
-                    cache: false,
-                    contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
-                    success: printWeather,
-                    error: errorHandle,
-                    //Función que se ejecuta sin importar el resultado de la petición Ajax
-                    //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
-                    complete: function () {
-                        console.log("Petición Ajax realizada.");
-                        app.ajaxInProgress = false;
-                        $("#indicadorAjaxEnCurso").hide();
-                    }
-                });
-            }
-        };
-        
-        //Maneja los errores de la petición Ajax
-        //err = { cod, desc }
-        var errorHandle = function (err) {
-            //La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
-            $("#forecast-container").hide();
-            $("#condicionesActuales").hide();
-            var errorContainer = $("#error-container");
-            errorContainer.hide();
-
-            var errorMsg = err.statusText +
-                "\n Error " + err.status;
-
-            errorContainer.html(errorMsg);
-            errorContainer.slideDown(200).delay(3000).slideUp(2000);
-        };
-        
-        //Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
-        //Muestra en pantalla la información meteorológica
-        var printWeather = function (json) {  
-            //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
-            if(json.ok) {
-                //Si la respuesta no contiene errores
-                if(json.info.data.error === undefined) {
-                    //Carga del tiempo actual
-                    var temperatura = $(".temperatura").text(json.info.data.current_condition[0].temp_C + "Cº");  
-                    $(".estado").text(json.info.data.current_condition[0].weatherDesc[0].value);
-                     $(temperatura[0]).closest("div").show();
-                    $(".localidad-temperatura").text(json.info.data.request[0].query);
-                    
-                    //TODO utilizar los siguientes datos referentes al tiempo actual
-                    /*$("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
-                    $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm");
-                    $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");*/
-
-                    //Carga de la imagen asociada al tiempo actual
-                    var imagenActual = $(".imagen-actual");
-                    imagenActual.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
-
-                    
-                    
-                    //Presentación de la previsión meteorológica (diferentes de temperatura actual)
-                    var jsonForecast = json.info.data.weather;
-                    var cabeceras = $(".cabecera");
-                    
-                    if(jsonForecast !== undefined) {
-                        $.each(jsonForecast, function (key, value) {
-                            
-                            //Mostrar fecha en formato España
-                            var date = new Date(value.date);
-                            var day = date.getDate();
-                            var month = date.getMonth() + 1;
-                            var year = date.getFullYear();
-
-                            var fechaFormateada = day + "/" + month + "/" + year;
-                            var hoy = new Date();
-                            
-                            if((hoy.getDate() == day) && (hoy.getMonth() +1 == month) && (hoy.getFullYear() == year)) {
-                                fechaFormateada = "Hoy";
-                            }
-
-                            $(cabeceras[key]).text(fechaFormateada);
-                            $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");  
-                            $("#estado" + key).text(value.weatherDesc[0].value);
-                            $("#precipitacion" + key).text(value.precipMM + "mm"); 
-                            $("#velocidad-viento" + key).text(value.windspeedKmph + "Km/h");
-                            var imagen = $("#imagen" + key);
-                            imagen.attr("src", value.weatherIconUrl[0].value);
-                            
-                        });
-                    }
-                    
-                    
-                    //Animación para la presentación del listado de datos y la imagen
-                    var forecastContainer = $("#forecast-container");
-                    if(forecastContainer.is(":visible")) {
-                        $("#forecast-container").slideUp(200).delay(200).slideDown(1000);
-                        $("#condicionesActuales").hide().slideDown("1000");
-                    } else {
-                        $("#forecast-container").slideDown(1000);
-                        $("#condicionesActuales").hide().slideDown("1000");
-                    }
-                } else {
-                    //Se pasa el error a la función manejadora de errores
-                    errorHandle({statusText: json.info.data.error[0].msg, status: 200});  
-                }
-            } else {
-                errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});   
-            }
-        };
-        
-        $(document).ready(app.onReady.apply(app));
+        $(document).ready(app.onReady);
     </script>
 </body>
 
