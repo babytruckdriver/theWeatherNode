@@ -33,18 +33,7 @@ jQuery(function ($) {
                         $("body").find("input[type=text]:visible:first").focus();
                         this.cacheElements();
                         this.bindEvents();
-
-
-
-                       /* var routes = {
-                                '/*': this.eventWeatherInfo
-                        };*/
-
-                        var router = Router; //Router(routes);
-                        router.configure({
-                                on: this.allroutes.bind(this)
-                        });
-                        router.init();
+                        this.route();
 
                 },
                 cacheElements: function () {
@@ -73,11 +62,12 @@ jQuery(function ($) {
                                 $(event.target).removeClass("error-input");
                         });
                 },
-                allroutes: function () {
+                route: function () {
                         var route = window.location.hash.slice(2);
-                        console.log(">>>" + route);
+                        // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma
                         if (route.length) {
                                 this.localidad.val(route);
+                                this.txtLocalidad.text(route);
                                 this.btoGetWeatherInfo.click();
                         }
                 },
@@ -202,6 +192,13 @@ jQuery(function ($) {
                         if (json.ok) {
                                 //Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
+                                        //Se modifica la URL con la localidad consultada con el fin de que pueda ser guardada como favorito o utilizada de enlace
+                                        if (!window.location.hash) {
+                                                window.location += "#/"+ this.localidad.val();
+                                        } else {
+                                                window.location = new String(window.location).replace(window.location.hash, "#/"+ this.localidad.val());
+                                        }
+
                                         //Carga del tiempo actual
                                         var temperatura = this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
                                         this.estado.text(json.info.data.current_condition[0].weatherDesc[0].value);
