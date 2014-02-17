@@ -185,7 +185,7 @@ app.get('/forecast.:formato?', function (req, res) {
 
     console.log("Final EndPoint: " + endPoint);
 
-    //TODO Cachear respuesta (la información del servicio se actualiza cada 3,4 horas)
+    //T O D O  Cachear respuesta (la información del servicio se actualiza cada 3,4 horas)
     //Realiza conexión con el servicio Web
     http.get(endPoint, function (response) {
         var ok = true;
@@ -194,7 +194,7 @@ app.get('/forecast.:formato?', function (req, res) {
         console.log("Got response status code: " + response.statusCode);
         
         if (statusCode !== 200) {
-            //TODO Aunque se retorna al llamante este objeto también salta el evento on("data"), aunque no llega a enviar su objeto. Investigar.
+            //T O D O Aunque se retorna al llamante este objeto también salta el evento on("data"), aunque no llega a enviar su objeto. Investigar.
             console.log("Error en la llamada al servicio. No se ha devuelto código 200.");
             ok = false;
             res.json(ok, {error: "Se ha producido un error."});             
