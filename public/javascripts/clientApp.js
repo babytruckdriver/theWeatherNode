@@ -1,5 +1,8 @@
 /*jslint indent:8, devel:true, browser:true, vars:true*/
-/*global jQuery, $, Handlebars*/
+/*global jQuery, $, Handlebars, Router*/
+
+//TODO: Añadir soporte para Director.js [https://github.com/flatiron/director]
+//Ejemplo en la página del proyecto y en todoMVC [https://github.com/tastejs/todomvc/blob/gh-pages/architecture-examples/jquery/js/app.js]
 
 //Esta es otra forma de escribir '$(document).ready()'
 jQuery(function ($) {
@@ -30,21 +33,33 @@ jQuery(function ($) {
                         $("body").find("input[type=text]:visible:first").focus();
                         this.cacheElements();
                         this.bindEvents();
+
+
+
+                       /* var routes = {
+                                '/*': this.eventWeatherInfo
+                        };*/
+
+                        var router = Router; //Router(routes);
+                        router.configure({
+                                on: this.allroutes.bind(this)
+                        });
+                        router.init();
+
                 },
                 cacheElements: function () {
                         this.forecastTemplate = Handlebars.compile($('#forecast-template').html());
                         this.weatherNode = $("#weatherNode");
                         this.condicionesActuales = this.weatherNode.find("#condicionesActuales");
+                        this.cuerpo = this.weatherNode.find(".cuerpo");
                         this.temperatura = this.condicionesActuales.find(".temperatura");
                         this.estado = this.condicionesActuales.find(".estado");
                         this.localidadTemperatura = this.condicionesActuales.find(".localidad-temperatura");
                         this.imagenActual = this.condicionesActuales.find(".imagen-actual");
-                        this.cuerpo = this.weatherNode.find(".cuerpo");
                         this.localidad = this.cuerpo.find("#localidad");
                         this.indicadorAjaxEnCurso = this.cuerpo.find("#indicadorAjaxEnCurso");
                         this.btoGetWeatherInfo = this.cuerpo.find("#getWeatherInfo");
                         this.forecastContainer = this.cuerpo.find("#forecast-container");
-                        this.cabeceras = this.forecastContainer.find(".cabecera");
                         this.validacionesContainer = this.cuerpo.find("#validaciones-container");
                         this.errorContainer = this.cuerpo.find("#error-container");
                         this.txtLocalidad = this.cuerpo.find(".localidad");
@@ -57,6 +72,14 @@ jQuery(function ($) {
                         this.localidad.on("click", function (event) {
                                 $(event.target).removeClass("error-input");
                         });
+                },
+                allroutes: function () {
+                        var route = window.location.hash.slice(2);
+                        console.log(">>>" + route);
+                        if (route.length) {
+                                this.localidad.val(route);
+                                this.btoGetWeatherInfo.click();
+                        }
                 },
 
                 /* Métodos utilizados desde 'bindEvents' */
@@ -162,7 +185,9 @@ jQuery(function ($) {
                                         success: this.printWeather.bind(this),
                                         error: this.errorHandle.bind(this),
                                         //Función que se ejecuta sin importar el resultado de la petición Ajax
-                                        //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                                        //CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Quizá
+                                        //este no sea el mejor sitio para indicar que la función Ajax ha terminado [ajaxInProgress = false] y sea mejor hacerlo
+                                        //tanto en el success como en el error.
                                         complete: function () {
                                                 ajaxInProgress = false;
                                                 that.indicadorAjaxEnCurso.hide();
@@ -276,7 +301,7 @@ jQuery(function ($) {
                             success: printLocationHelper,
                             error: errorHandle,
                             //Función que se ejecuta sin importar el resultado de la petición Ajax
-                            //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                            //FUTURE He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
                             complete: function () {
                                 console.log("Petición Ajax realizada.");
                                 this.ajaxInProgress = false;
