@@ -1,8 +1,5 @@
 /*jslint indent:8, devel:true, browser:true, vars:true*/
-/*global jQuery, $, Handlebars, Router*/
-
-//TODO: Añadir soporte para Director.js [https://github.com/flatiron/director]
-//Ejemplo en la página del proyecto y en todoMVC [https://github.com/tastejs/todomvc/blob/gh-pages/architecture-examples/jquery/js/app.js]
+/*global jQuery, $, Handlebars*/
 
 //Esta es otra forma de escribir '$(document).ready()'
 jQuery(function ($) {
