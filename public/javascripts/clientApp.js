@@ -1,5 +1,5 @@
 /*jslint indent:8, devel:true, browser:true, vars:true*/
-/*global jQuery, $*/
+/*global jQuery, $, Handlebars*/
 
 //Esta es otra forma de escribir '$(document).ready()'
 jQuery(function ($) {
@@ -32,6 +32,7 @@ jQuery(function ($) {
                         this.bindEvents();
                 },
                 cacheElements: function () {
+                        this.forecastTemplate = Handlebars.compile($('#forecast-template').html());
                         this.weatherNode = $("#weatherNode");
                         this.condicionesActuales = this.weatherNode.find("#condicionesActuales");
                         this.temperatura = this.condicionesActuales.find(".temperatura");
@@ -199,6 +200,8 @@ jQuery(function ($) {
                                                 //Se quiere utilizar 'this' dentro del bucle, pero los bucles crean sus propios 'this'
                                                 //por lo que guardo el 'this' actual en una variable alcanzable desde dentro del bucle llamada 'that'
                                                 var that = this;
+                                                this.forecastContainer.empty();
+
                                                 $.each(jsonForecast, function (key, value) {
 
                                                         //Mostrar fecha en formato Español/España
@@ -214,17 +217,19 @@ jQuery(function ($) {
                                                                 fechaFormateada = "Hoy";
                                                         }
 
+                                                        var forecast = {
+                                                                imagen: value.weatherIconUrl[0].value,
+                                                                cabecera: fechaFormateada,
+                                                                temperatura: value.tempMaxC + "/" + value.tempMinC + "Cº Max/min",
+                                                                estado: value.weatherDesc[0].value,
+                                                                precipitacion: value.precipMM + "mm",
+                                                                velocidadViento: value.windspeedKmph + "Km/h"
+                                                        };
 
-
-                                                        $(that.cabeceras[key]).text(fechaFormateada);
-                                                        $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");
-                                                        $("#estado" + key).text(value.weatherDesc[0].value);
-                                                        $("#precipitacion" + key).text(value.precipMM + "mm");
-                                                        $("#velocidad-viento" + key).text(value.windspeedKmph + "Km/h");
-                                                        var imagen = $("#imagen" + key);
-                                                        imagen.attr("src", value.weatherIconUrl[0].value);
-
+                                                        that.forecastContainer.append(that.forecastTemplate(forecast));
                                                 });
+
+                                                this.forecastContainer.append("<div class='clear'></div>");
                                         }
 
                                         //Animación para la presentación del listado de datos y la imagen

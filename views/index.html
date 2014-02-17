@@ -47,104 +47,6 @@ para poder cachear los elementos de forma correcta en 'clientApp.js' (con find()
                 </div>
 
                 <div id="forecast-container" class="oculto">
-                        <!-- //TODO: crear dinámicamente con javaScript cada div.resultado-->
-                        <div class="resultado tiempo-actual">
-                                <ul>
-                                        <li class="cabecera"></li>
-                                        <li>
-                                                <ul>
-                                                        <li>
-                                                                <img id="imagen0" class="imagen-reducida" src="">
-                                                        </li>
-                                                        <li>Temperatura:
-                                                                <span id="temperatura0" class="info"></span>
-                                                        </li>
-                                                        <li>Estado:
-                                                                <span id="estado0" class="info"></span>
-                                                        </li>
-                                                        <li>Precipitación:
-                                                                <span id="precipitacion0" class="info"></span>
-                                                        </li>
-                                                        <li>Velocidad del viento:
-                                                                <span id="velocidad-viento0" class="info"></span>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                </ul>
-                        </div>
-                        <div class="resultado tiempo-actual">
-                                <ul>
-                                        <li class="cabecera"></li>
-                                        <li>
-                                                <ul>
-                                                        <li>
-                                                                <img id="imagen1" class="imagen-reducida" src="">
-                                                        </li>
-                                                        <li>Temperatura:
-                                                                <span id="temperatura1" class="info"></span>
-                                                        </li>
-                                                        <li>Estado:
-                                                                <span id="estado1" class="info"></span>
-                                                        </li>
-                                                        <li>Precipitación:
-                                                                <span id="precipitacion1" class="info"></span>
-                                                        </li>
-                                                        <li>Velocidad del viento:
-                                                                <span id="velocidad-viento1" class="info"></span>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                </ul>
-                        </div>
-                        <div class="resultado tiempo-actual">
-                                <ul>
-                                        <li class="cabecera"></li>
-                                        <li>
-                                                <ul>
-                                                        <li>
-                                                                <img id="imagen2" class="imagen-reducida" src="">
-                                                        </li>
-                                                        <li>Temperatura:
-                                                                <span id="temperatura2" class="info"></span>
-                                                        </li>
-                                                        <li>Estado:
-                                                                <span id="estado2" class="info"></span>
-                                                        </li>
-                                                        <li>Precipitación:
-                                                                <span id="precipitacion2" class="info"></span>
-                                                        </li>
-                                                        <li>Velocidad del viento:
-                                                                <span id="velocidad-viento2" class="info"></span>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                </ul>
-                        </div>
-                        <div class="resultado tiempo-actual">
-                                <ul>
-                                        <li class="cabecera"></li>
-                                        <li>
-                                                <ul>
-                                                        <li>
-                                                                <img id="imagen3" class="imagen-reducida" src="">
-                                                        </li>
-                                                        <li>Temperatura:
-                                                                <span id="temperatura3" class="info"></span>
-                                                        </li>
-                                                        <li>Estado:
-                                                                <span id="estado3" class="info"></span>
-                                                        </li>
-                                                        <li>Precipitación:
-                                                                <span id="precipitacion3" class="info"></span>
-                                                        </li>
-                                                        <li>Velocidad del viento:
-                                                                <span id="velocidad-viento3" class="info"></span>
-                                                        </li>
-                                                </ul>
-                                        </li>
-                                </ul>
-                        </div>
-                        <div class="clear"></div>
 
                 </div>
 
@@ -152,8 +54,35 @@ para poder cachear los elementos de forma correcta en 'clientApp.js' (con find()
                 <div id="validaciones-container" class="oculto"></div>
         </div>
 
+        <script  id="forecast-template" type="text/x-handlebars-template">
+                <div class="resultado tiempo-actual">
+                        <ul>
+                                <li class="cabecera">{{cabecera}}</li>
+                                <li>
+                                        <ul>
+                                                <li>
+                                                        <img id="imagen" class="imagen-reducida" src="{{imagen}}">
+                                                </li>
+                                                <li>Temperatura:
+                                                        <span id="temperatura" class="info">{{temperatura}}</span>
+                                                </li>
+                                                <li>Estado:
+                                                        <span id="estado" class="info">{{estado}}</span>
+                                                </li>
+                                                <li>Precipitación:
+                                                        <span id="precipitacion" class="info">{{precipitacion}}</span>
+                                                </li>
+                                                <li>Velocidad del viento:
+                                                        <span id="velocidad-viento" class="info">{{velocidadViento}}</span>
+                                                </li>
+                                        </ul>
+                                </li>
+                        </ul>
+                </div>
+        </script>
 
         <script src="javascripts/jquery-2.1.0.js"></script>
+        <script src="javascripts/handlebars-v1.3.0.js"></script>
         <script src="javascripts/clientApp.js"></script>
 </body>
 
