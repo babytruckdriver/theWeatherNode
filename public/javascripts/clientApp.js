@@ -192,17 +192,17 @@ jQuery(function ($) {
                         if (json.ok) {
                                 //Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
-                                        //Se modifica la URL con la localidad consultada con el fin de que pueda ser guardada como favorito o utilizada de enlace
+                                        //Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
                                         if (!window.location.hash) {
                                                 window.location += "#/"+ this.localidad.val();
                                         } else {
-                                                window.location = new String(window.location).replace(window.location.hash, "#/"+ this.localidad.val());
+                                                window.location = new String(window.location).replace("/#/" + escape(window.location.hash.slice(2)), "#/"+ this.localidad.val());
                                         }
 
                                         //Carga del tiempo actual
-                                        var temperatura = this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
+                                        this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
                                         this.estado.text(json.info.data.current_condition[0].weatherDesc[0].value);
-                                        $(temperatura[0]).closest("div").show();
+                                        $(this.temperatura).closest("div").show();
                                         this.localidadTemperatura.text(json.info.data.request[0].query);
 
                                         //FUTURE utilizar los siguientes datos referentes al tiempo actual
@@ -246,7 +246,6 @@ jQuery(function ($) {
                                                                 precipitacion: value.precipMM + "mm",
                                                                 velocidadViento: value.windspeedKmph + "Km/h"
                                                         };
-
                                                         that.forecastContainer.append(that.forecastTemplate(forecast));
                                                 });
 
