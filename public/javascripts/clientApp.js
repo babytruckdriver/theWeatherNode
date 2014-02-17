@@ -191,8 +191,6 @@ jQuery(function ($) {
                                         //Carga de la imagen asociada al tiempo actual
                                         this.imagenActual.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
 
-
-
                                         //Presentación de la previsión meteorológica (diferentes de temperatura actual)
                                         var jsonForecast = json.info.data.weather;
 
@@ -217,6 +215,7 @@ jQuery(function ($) {
                                                                 fechaFormateada = "Hoy";
                                                         }
 
+                                                        //Creo objeto de configuración de entrada para la plantilla Handlebars 'forecastTemplate'
                                                         var forecast = {
                                                                 imagen: value.weatherIconUrl[0].value,
                                                                 cabecera: fechaFormateada,
