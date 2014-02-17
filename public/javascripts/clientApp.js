@@ -9,11 +9,20 @@ jQuery(function($) {
 
         var ENTER_KEY = 13;
 
-        //FUTURE Objeto contenedor de utilidades. Aquí podría ir el esqueleto de la llamada vía Ajax
+        //Objeto contenedor de utilidades. Aquí podría ir el esqueleto de la llamada vía Ajax
         //Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
-        /*var utils = {
-
-        };*/
+        var util = {
+                getDiaSemana: function (numDia){
+                        var dias = [{short: "D", complete: "Domingo"},
+                                    {short: "L", complete: "Lunes"},
+                                    {short: "M", complete: "Martes"},
+                                    {short: "X", complete: "Miércoles"},
+                                    {short: "J", complete: "Jueves"},
+                                    {short: "V", complete: "Viernes"},
+                                    {short: "S", complete: "Sábado"}];
+                        return dias[numDia];
+                }
+        };
 
         var App = {
                 init: function () {
@@ -192,18 +201,20 @@ jQuery(function($) {
                                                 var that = this;
                                                 $.each(jsonForecast, function (key, value) {
 
-                                                        //Mostrar fecha en formato España
+                                                        //Mostrar fecha en formato Español/España
                                                         var date = new Date(value.date);
                                                         var day = date.getDate();
                                                         var month = date.getMonth() + 1;
                                                         var year = date.getFullYear();
 
-                                                        var fechaFormateada = day + "/" + month + "/" + year;
+                                                        var fechaFormateada = util.getDiaSemana(date.getDay()).complete + " " + day + "/" + month + "/" + year;
                                                         var hoy = new Date();
 
                                                         if((hoy.getDate() == day) && (hoy.getMonth() +1 == month) && (hoy.getFullYear() == year)) {
                                                                 fechaFormateada = "Hoy";
                                                         }
+
+
 
                                                         $(that.cabeceras[key]).text(fechaFormateada);
                                                         $("#temperatura" + key).text(value.tempMaxC + "/" + value.tempMinC + "Cº Max/min");
