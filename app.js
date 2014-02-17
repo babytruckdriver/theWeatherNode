@@ -1,6 +1,11 @@
+/*jslint indent:8, devel:true, node:true, vars: true*/
+/*global console*/
+
 /**
  * Module dependencies.
  */
+
+"use strict";
 
 var express = require('express'),
         //routes = require('./routes'),
@@ -61,7 +66,7 @@ app.get('/', function (req, res) {
         console.log("Aplicación iniciada correctamente.");
 
         //Para usar HTML estandar en vez de JADE
-        res.sendfile ('views/index.html', {root:__dirname});
+        res.sendfile('views/index.html', {root: __dirname});
 });
 
 app.get('/forecast.:formato?', function (req, res) {
@@ -75,7 +80,7 @@ app.get('/forecast.:formato?', function (req, res) {
         var data = {
                 format: req.param("formato"),
                 q: req.param("localidad"), //localidad
-                num_of_days: req.param("numDias"),
+                num_of_days: req.param("numDias")
         };
         //Añadimos al objeto 'data' la función 'app.stringify' que trabaja sobre 'this'
         data.stringify = app.stringify;
@@ -104,7 +109,7 @@ app.get('/forecast.:formato?', function (req, res) {
 
         //TODO Cachear respuesta (la información del servicio se actualiza cada 3,4 horas)
         //Realiza conexión con el servicio Web
-        http.get(options , function (response) {
+        http.get(options, function (response) {
                 var ok = true;
                 response.setEncoding('utf-8');
                 var statusCode = response.statusCode;
@@ -120,19 +125,18 @@ app.get('/forecast.:formato?', function (req, res) {
                 }
 
                 //Escuchador del evento 'data' de la respuesta
-                response.on("data", function(chunk) {
+                response.on("data", function (chunk) {
                         //Se añade al objeto a devolver los datos que va devolviendo el servicio
                         output += chunk.toString();
                 });
 
-                response.on('end', function() {
+                response.on('end', function () {
                         //Cuando la conexión ha terminado (el servicio ha enviado todos los datos), se convierte la respuesta a JSON
                         //Si 'output' no es un JSON correcto la función 'parse' fallará (try catch)
                         var json = "";
                         try {
                                 json = JSON.parse(output);
-                        }
-                        catch(e) {
+                        } catch (e) {
                                 ok = false;
                                 console.log("Se ha producido un error: " + e.message);
                                 json = {ok: ok, cod: 500};
@@ -144,7 +148,7 @@ app.get('/forecast.:formato?', function (req, res) {
         //Escuchador del evento 'error' de la request
         }).on('error', function (e) {
                 console.log("Got error: " + e.message);
-                ok = false;
+                var ok = false;
                 res.json({ok: ok, cod: 500});
         });
 

@@ -1,25 +1,25 @@
-/*global jQuery, $, console*/
+/*jslint indent:8, devel:true, browser:true, vars:true*/
+/*global jQuery, $*/
 
 //Esta es otra forma de escribir '$(document).ready()'
-jQuery(function($) {
+jQuery(function ($) {
         "use strict";
 
         //La variable informa si hay una petición Ajax en proceso
-        var ajaxInProgress = false;
-
-        var ENTER_KEY = 13;
+        var ajaxInProgress = false,
+                ENTER_KEY = 13;
 
         //Objeto contenedor de utilidades. Aquí podría ir el esqueleto de la llamada vía Ajax
         //Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
         var util = {
-                getDiaSemana: function (numDia){
+                getDiaSemana: function (numDia) {
                         var dias = [{short: "D", complete: "Domingo"},
-                                    {short: "L", complete: "Lunes"},
-                                    {short: "M", complete: "Martes"},
-                                    {short: "X", complete: "Miércoles"},
-                                    {short: "J", complete: "Jueves"},
-                                    {short: "V", complete: "Viernes"},
-                                    {short: "S", complete: "Sábado"}];
+                                        {short: "L", complete: "Lunes"},
+                                        {short: "M", complete: "Martes"},
+                                        {short: "X", complete: "Miércoles"},
+                                        {short: "J", complete: "Jueves"},
+                                        {short: "V", complete: "Viernes"},
+                                        {short: "S", complete: "Sábado"}];
                         return dias[numDia];
                 }
         };
@@ -54,7 +54,7 @@ jQuery(function($) {
                         this.localidad.on("keyup", this.eventLocalidad.bind(this));
                         //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
                         this.localidad.on("click", function (event) {
-                            $(event.target).removeClass("error-input");
+                                $(event.target).removeClass("error-input");
                         });
                 },
 
@@ -63,13 +63,13 @@ jQuery(function($) {
                 eventWeatherInfo: function () {
                         //Validaciones sobre los campos de entrada
                         var erroresEntrada = false;
-                        if(!this.localidad.val()) {
+                        if (!this.localidad.val()) {
                                 this.muestraValidaciones(["Es necesario especificar una localidad"]);
                                 this.localidad.focus().addClass("error-input");
                                 erroresEntrada = true;
                         }
 
-                        if(!erroresEntrada) {
+                        if (!erroresEntrada) {
                                 this.validacionesContainer.hide();
                                 this.getWeatherInfo();
                         }
@@ -79,7 +79,7 @@ jQuery(function($) {
                         this.localidad.removeClass("error-input");
 
                         //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
-                        if(event.keyCode === ENTER_KEY) {
+                        if (event.keyCode === ENTER_KEY) {
                                 this.btoGetWeatherInfo.click();
                                 return true;
                         }
@@ -89,14 +89,14 @@ jQuery(function($) {
                         this.txtLocalidad.text($(event.target).val());
 
                         //Si el campo está vacío
-                        if(!$(event.target).val()) {
+                        if (!$(event.target).val()) {
                                 this.txtLocalidad.text("...");
                         }
 
                         //Si se han introducido más de 3 caracteres se procede a buscar localidades
                         //que coincidan con esos caracteres
                         //FUTURE Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
-                        /*if($(this).val().length >= 4) {
+                        /*if ($(this).val().length >= 4) {
                         getLocalidades(this);
                         }*/
                 },
@@ -108,7 +108,7 @@ jQuery(function($) {
 
                         this.validacionesContainer.html("<span class='centrado'>" + arrValidaciones[0] + "<span>");
 
-                        if(this.validacionesContainer.is(":visible")) {
+                        if (this.validacionesContainer.is(":visible")) {
                                 this.validacionesContainer.slideUp(200).delay(200).slideDown(200);
                         } else {
                                 this.validacionesContainer.slideDown(200);
@@ -123,8 +123,7 @@ jQuery(function($) {
                         this.condicionesActuales.hide();
                         this.errorContainer.hide();
 
-                        var errorMsg = err.statusText +
-                        "\n Error " + err.status;
+                        var errorMsg = err.statusText + "\n Error " + err.status;
 
                         this.errorContainer.html(errorMsg);
                         this.errorContainer.slideDown(200).delay(3000).slideUp(2000);
@@ -132,15 +131,15 @@ jQuery(function($) {
                 //Recupera la información meteorológica para la localización introducida
                 getWeatherInfo: function () {
                         //Si no hay una petición Ajax en curso se realiza una
-                        if(!ajaxInProgress) {
+                        if (!ajaxInProgress) {
                                 //URL del servicio RESTful del Backend de la aplicación
                                 var targetUrl = "/forecast";
 
                                 //Objecto con los datos de entrada de la petición
                                 var datos = {
-                                    formato: "json",
-                                    localidad: this.localidad.val(),
-                                    numDias: 4
+                                        formato: "json",
+                                        localidad: this.localidad.val(),
+                                        numDias: 4
                                 };
 
                                 ajaxInProgress = true;
@@ -158,7 +157,8 @@ jQuery(function($) {
                                         dataType: "json",
                                         cache: false,
                                         contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
-                                        success: this.printWeather.bind(this),  //En el contexto de una invocación Ajax, 'this' no se refiere al objeto contenedor sino a la propia llamada. Por eso 'bind(this)'
+                                        //En el contexto de una invocación Ajax, 'this' no se refiere al objeto contenedor sino a la propia llamada. Por eso 'bind(this)'
+                                        success: this.printWeather.bind(this),
                                         error: this.errorHandle.bind(this),
                                         //Función que se ejecuta sin importar el resultado de la petición Ajax
                                         //TODO He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
@@ -173,9 +173,9 @@ jQuery(function($) {
                 //Muestra en pantalla la información meteorológica
                 printWeather: function (json) {
                         //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
-                        if(json.ok) {
+                        if (json.ok) {
                                 //Si la respuesta no contiene errores
-                                if(json.info.data.error === undefined) {
+                                if (json.info.data.error === undefined) {
                                         //Carga del tiempo actual
                                         var temperatura = this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
                                         this.estado.text(json.info.data.current_condition[0].weatherDesc[0].value);
@@ -195,7 +195,7 @@ jQuery(function($) {
                                         //Presentación de la previsión meteorológica (diferentes de temperatura actual)
                                         var jsonForecast = json.info.data.weather;
 
-                                        if(jsonForecast !== undefined) {
+                                        if (jsonForecast !== undefined) {
                                                 //Se quiere utilizar 'this' dentro del bucle, pero los bucles crean sus propios 'this'
                                                 //por lo que guardo el 'this' actual en una variable alcanzable desde dentro del bucle llamada 'that'
                                                 var that = this;
@@ -210,7 +210,7 @@ jQuery(function($) {
                                                         var fechaFormateada = util.getDiaSemana(date.getDay()).complete + " " + day + "/" + month + "/" + year;
                                                         var hoy = new Date();
 
-                                                        if((hoy.getDate() == day) && (hoy.getMonth() +1 == month) && (hoy.getFullYear() == year)) {
+                                                        if ((hoy.getDate() === day) && (hoy.getMonth() + 1 === month) && (hoy.getFullYear() === year)) {
                                                                 fechaFormateada = "Hoy";
                                                         }
 
@@ -228,7 +228,7 @@ jQuery(function($) {
                                         }
 
                                         //Animación para la presentación del listado de datos y la imagen
-                                        if(this.forecastContainer.is(":visible")) {
+                                        if (this.forecastContainer.is(":visible")) {
                                                 this.forecastContainer.slideUp(200).delay(200).slideDown(1000);
                                                 this.condicionesActuales.hide().slideDown("1000");
                                         } else {
@@ -249,7 +249,7 @@ jQuery(function($) {
                     //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
                     //Actualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
 
-                    if(!app.ajaxInProgress) {
+                    if (!app.ajaxInProgress) {
                         var targetUrl = "/location";
 
                         //Objecto con los datos de entrada de la petición
@@ -285,9 +285,9 @@ jQuery(function($) {
                 //Muestra las posibles localizaciones según el critério de búsqueda utilizado
                 printLocationHelper: function(json) {
                     //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
-                    if(json.ok) {
+                    if (json.ok) {
                         //Si la respuesta no contiene errores
-                        if(json.info.data == undefined) {
+                        if (json.info.data == undefined) {
                             //FUTURE hacer algo con los resultados obtenidos de buscar localidades según se va escribiendo
                             //json.info.search_api.result[0].areaName[0].value);
                         } else {
