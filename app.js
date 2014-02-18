@@ -79,7 +79,7 @@ app.get('/forecast.:formato?', function (req, res) {
         //Datos de entrada de la petición agrupados en un objeto
         var data = {
                 format: req.param("formato"),
-                q: escape(req.param("localidad")), //Codificación de los espcios: %20. Ej: San%20Fernando%20de%20henares
+                q: encodeURIComponent(req.param("localidad")), //Codificación de los espcios: %20. Ej: San%20Fernando%20de%20henares
                 num_of_days: req.param("numDias")
         };
         //Añadimos al objeto 'data' la función 'app.stringify' que trabaja sobre 'this'

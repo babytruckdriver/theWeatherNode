@@ -9,7 +9,7 @@ jQuery(function ($) {
         var ajaxInProgress = false,
                 ENTER_KEY = 13;
 
-        //Objeto contenedor de utilidades. Aquí podría ir el esqueleto de la llamada vía Ajax
+        //Objeto contenedor de utilidades.
         //Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
         var util = {
                 getDiaSemana: function (numDia) {
@@ -61,7 +61,7 @@ jQuery(function ($) {
                 },
                 route: function () {
                         var route = window.location.hash.slice(2);
-                        // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma
+                        // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
                         if (route.length) {
                                 this.localidad.val(route);
                                 this.txtLocalidad.text(route);
@@ -191,9 +191,9 @@ jQuery(function ($) {
                                 if (json.info.data.error === undefined) {
                                         //Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
                                         if (!window.location.hash) {
-                                                window.location += "#/"+ this.localidad.val();
+                                                window.location += "#/" + this.localidad.val();
                                         } else {
-                                                window.location = new String(window.location).replace("/#/" + escape(window.location.hash.slice(2)), "#/"+ this.localidad.val());
+                                                window.location = String(window.location).replace("/#/" + encodeURIComponent(window.location.hash.slice(2)), "#/" + this.localidad.val());
                                         }
 
                                         //Carga del tiempo actual
