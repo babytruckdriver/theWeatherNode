@@ -6,14 +6,14 @@ jQuery(function ($) {
         "use strict";
 
         //La variable informa si hay una petición Ajax en proceso
-        var ajaxInProgress = false,
+        var     ajaxInProgress = false,
                 ENTER_KEY = 13;
 
         //Objeto contenedor de utilidades.
         //Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
         var util = {
                 getDiaSemana: function (numDia) {
-                        var dias = [{short: "D", complete: "Domingo"},
+                        var dias = [    {short: "D", complete: "Domingo"},
                                         {short: "L", complete: "Lunes"},
                                         {short: "M", complete: "Martes"},
                                         {short: "X", complete: "Miércoles"},
@@ -31,9 +31,9 @@ jQuery(function ($) {
                         this.cacheElements();
                         this.bindEvents();
                         this.route();
-
                 },
                 cacheElements: function () {
+                        this.window = $(window);
                         this.forecastTemplate = Handlebars.compile($('#forecast-template').html());
                         this.weatherNode = $("#weatherNode");
                         this.condicionesActuales = this.weatherNode.find("#condicionesActuales");
@@ -58,19 +58,22 @@ jQuery(function ($) {
                         this.localidad.on("click", function (event) {
                                 $(event.target).removeClass("error-input");
                         });
-                },
-                route: function () {
-                        var route = window.location.hash.slice(2);
-                        // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
-                        if (route.length) {
-                                this.localidad.val(route);
-                                this.txtLocalidad.text(route);
-                                this.btoGetWeatherInfo.click();
-                        }
+                        this.window.on("hashchange", this.route.bind(this));
                 },
 
                 /* Métodos utilizados desde 'bindEvents' */
 
+                route: function (e) {
+                        var hash = window.location.hash.slice(2);
+                        // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
+                        // Si esta localidad informada coincide con la introducida en el campo de entrada no deberá realizarse la llamada
+                        // ya que es debido a que la llamada ya ha sido realizada y posteriormente se ha modificado el hash de la URL.
+                        if (hash.length && hash != this.localidad.val()) {
+                                this.localidad.val(hash);
+                                this.txtLocalidad.text(hash);
+                                this.btoGetWeatherInfo.click();
+                        }
+                },
                 eventWeatherInfo: function () {
                         //Validaciones sobre los campos de entrada
                         var erroresEntrada = false;
@@ -190,7 +193,8 @@ jQuery(function ($) {
                                 //Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
                                         //Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
-                                        if (!window.location.hash) {
+                                        var hash = window.location.hash;
+                                        if (!hash || (hash === "#")) {
                                                 window.location += "#/" + this.localidad.val();
                                         } else {
                                                 window.location = String(window.location).replace("/#/" + encodeURIComponent(window.location.hash.slice(2)), "#/" + this.localidad.val());

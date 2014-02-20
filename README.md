@@ -1,7 +1,7 @@
 theWheatherNode
 ===============
 
-Just another weather forecast webapp for practice jQuery and Node + Express.
+Just another weather forecast webapp for practice jQuery, Handlebars and Node + Express.
 
 Installation and execution instructions:
 ------------------------------------------

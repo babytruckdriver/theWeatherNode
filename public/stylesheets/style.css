@@ -19,7 +19,8 @@ body {
 }
 
 h2 {
-    color: #A4A4A4;    
+    color: #000;
+
 }
 
 ul {
@@ -29,14 +30,30 @@ ul {
     padding: 0;
 }
 
-a {
-    color: #00B7FF;
+/* Quito los estilos por defecto que pudieran tener los links*/
+
+a:link,:visited {
+    text-decoration:none;
+    border: none;
+    color: #000;
+}
+
+/*
+    Estilos específicos de la aplicación
+*/
+#weatherNode {
+	background: #fff;
+	padding: 20px;
+	margin-bottom: 40px;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
+    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 2px;
+	border-radius: 0 0 5px 5px;
 }
 
 /*
     Estilos botón de búsqueda
 */
-a.submitter {
+span.submitter {
 	display: block; 
     width: 380px; /* Si no se le da ancho el centrado (margin) no funciona */
     /*height: 30px; */
@@ -58,7 +75,7 @@ a.submitter {
     text-align: center;
 }
 
-a.submitter:hover {
+span.submitter:hover {
     color: #045FB4;
     
     -moz-transition: color 0.25s ease-in-out;
@@ -66,18 +83,7 @@ a.submitter:hover {
     transition: color 0.25s ease-in-out;
 }
 
-/*
-    Estilos específicos de la aplicación
-*/
-#weatherNode {
-	background: #fff;
-	padding: 20px;
-	margin-bottom: 40px;
-    /* TODO ESte estilo no funciona correctamente en Chrome*/
-    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
-    -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
-	border-radius: 0 0 5px 5px;
-}
+/* Otros estilos */
 
 div#forecast-container {
     /*padding: 5px;*/
@@ -181,7 +187,6 @@ div.entrada {
     opacity: 0.6;
     border-radius: 5px 5px 5px 5px;
     transform: scale(1);
-    -webkit-transform: scale(1.5);  
 }
 
 .imagen-mañana {
