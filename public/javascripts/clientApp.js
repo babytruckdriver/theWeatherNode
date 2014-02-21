@@ -68,10 +68,14 @@ jQuery(function ($) {
                         // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
                         // Si esta localidad informada coincide con la introducida en el campo de entrada no deberá realizarse la llamada
                         // ya que es debido a que la llamada ya ha sido realizada y posteriormente se ha modificado el hash de la URL.
-                        if (hash.length && hash != this.localidad.val()) {
+                        if (hash.length) {
                                 this.localidad.val(hash);
                                 this.txtLocalidad.text(hash);
                                 this.btoGetWeatherInfo.click();
+                        } else if (this.localidad.val()) {
+                                this.localidad.val("");
+                                this.txtLocalidad.text("...");
+                                window.location.reload();
                         }
                 },
                 eventWeatherInfo: function () {
@@ -140,7 +144,7 @@ jQuery(function ($) {
                         var errorMsg = err.statusText + "\n Error " + err.status;
 
                         this.errorContainer.html(errorMsg);
-                        this.errorContainer.slideDown(200).delay(3000).slideUp(2000);
+                        this.errorContainer.slideDown(200).delay(5000).slideUp(2000);
                 },
                 //Recupera la información meteorológica para la localización introducida
                 getWeatherInfo: function () {
@@ -193,11 +197,15 @@ jQuery(function ($) {
                                 //Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
                                         //Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
+                                        //La misma función (pushState), además, genera historial
                                         var hash = window.location.hash;
                                         if (!hash || (hash === "#")) {
-                                                window.location += "#/" + this.localidad.val();
+                                                window.history.pushState(null, "The Weathernode", "#/" + this.localidad.val());
                                         } else {
-                                                window.location = String(window.location).replace("/#/" + encodeURIComponent(window.location.hash.slice(2)), "#/" + this.localidad.val());
+                                                //Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
+                                                if (hash.slice(2) !== this.localidad.val()) {
+                                                        window.history.pushState(null, "The Weathernode", hash.replace(encodeURIComponent(hash.slice(2)), this.localidad.val()));
+                                                }
                                         }
 
                                         //Carga del tiempo actual
