@@ -59,6 +59,17 @@ jQuery(function ($) {
                                 $(event.target).removeClass("error-input");
                         });
                         this.window.on("hashchange", this.route.bind(this));
+
+                        //Acciones a ejecutar cuando una petición Ajax comienza y termina
+                        var that = this;
+                        $(document).ajaxStart(function () {
+                                ajaxInProgress = true;
+                                that.indicadorAjaxEnCurso.show();
+                        });
+                        $(document).ajaxStop(function () {
+                                ajaxInProgress = false;
+                                that.indicadorAjaxEnCurso.hide();
+                        });
                 },
 
                 /* Métodos utilizados desde 'bindEvents' */
@@ -158,9 +169,6 @@ jQuery(function ($) {
                                         numDias: 4
                                 };
 
-                                ajaxInProgress = true;
-                                this.indicadorAjaxEnCurso.show();
-
                                 //Se quiere utilizar 'this' dentro de una función [complete] de un objeto, pero la función tendrá como 'this' el objeto en el que fué creada
                                 //por lo que guardo el 'this' actual en una variable alcanzable desde dentro de la función llamada 'that'
                                 var that = this;
@@ -177,12 +185,9 @@ jQuery(function ($) {
                                         success: this.printWeather.bind(this),
                                         error: this.errorHandle.bind(this),
                                         //Función que se ejecuta sin importar el resultado de la petición Ajax
-                                        //CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Quizá
-                                        //este no sea el mejor sitio para indicar que la función Ajax ha terminado [ajaxInProgress = false] y sea mejor hacerlo
-                                        //tanto en el success como en el error.
+                                        //CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta.
                                         complete: function () {
-                                                ajaxInProgress = false;
-                                                that.indicadorAjaxEnCurso.hide();
+
                                         }
                                 });
                         }// End if
