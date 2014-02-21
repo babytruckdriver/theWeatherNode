@@ -66,8 +66,6 @@ jQuery(function ($) {
                 route: function (e) {
                         var hash = window.location.hash.slice(2);
                         // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
-                        // Si esta localidad informada coincide con la introducida en el campo de entrada no deberá realizarse la llamada
-                        // ya que es debido a que la llamada ya ha sido realizada y posteriormente se ha modificado el hash de la URL.
                         if (hash.length) {
                                 this.localidad.val(hash);
                                 this.txtLocalidad.text(hash);
