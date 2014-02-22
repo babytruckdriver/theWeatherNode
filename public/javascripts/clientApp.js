@@ -1,16 +1,27 @@
 /*jslint indent:8, devel:true, browser:true, vars:true*/
 /*global jQuery, $, Handlebars*/
 
-//Esta es otra forma de escribir '$(document).ready()'
+// Esta es otra forma de escribir '$(document).ready()'
 jQuery(function ($) {
         "use strict";
 
-        //La variable informa si hay una petición Ajax en proceso
+        // ajaxInProgress: La variable informa si hay una petición Ajax en proceso
         var     ajaxInProgress = false,
                 ENTER_KEY = 13;
 
-        //Objeto contenedor de utilidades.
-        //Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
+        //Tipos de llamadas Ajax y tiempo de cacheo de respuestas
+        var     FORECAST_CALL = 0,
+                LOCALIDAD_CALL = 1,
+                CACHE_MINUTES = 1;
+
+        //TODO: Terminar de implementar esta funcionalidad añadiendo métodos y propiedades al objeto
+        // La información meteorológica se actualiza cada 3-4 horas, por lo que cacheamos durante 1/2 hora la información en el cliente
+        var cache = {
+                responses: {}
+        };
+
+        // Objeto contenedor de utilidades.
+        // Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
         var util = {
                 getDiaSemana: function (numDia) {
                         var dias = [    {short: "D", complete: "Domingo"},
@@ -26,7 +37,7 @@ jQuery(function ($) {
 
         var App = {
                 init: function () {
-                        //Poner el foco en el primer campo de entrada visible
+                        // Poner el foco en el primer campo de entrada visible
                         $("body").find("input[type=text]:visible:first").focus();
                         this.cacheElements();
                         this.bindEvents();
@@ -51,29 +62,26 @@ jQuery(function ($) {
                         this.txtLocalidad = this.cuerpo.find(".localidad");
                 },
                 bindEvents: function () {
-                        //Al clicar el botón se consulta el tiempo para la localidad indicada
+                        // Al clicar el botón se consulta el tiempo para la localidad indicada
                         this.btoGetWeatherInfo.on("click", this.eventWeatherInfo.bind(this));
                         this.localidad.on("keyup", this.eventLocalidad.bind(this));
-                        //Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
+                        // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
                         this.localidad.on("click", function (event) {
                                 $(event.target).removeClass("error-input");
                         });
                         this.window.on("hashchange", this.route.bind(this));
 
-                        //Acciones a ejecutar cuando una petición Ajax comienza y termina
+                        // Acciones a ejecutar cuando una petición Ajax comienza y/o termina
                         var that = this;
-                        $(document).ajaxStart(function () {
+                        $(document).on("ajaxStart", function () {
                                 ajaxInProgress = true;
                                 that.indicadorAjaxEnCurso.show();
                         });
-                        $(document).ajaxStop(function () {
+                        $(document).on("ajaxStop", function () {
                                 ajaxInProgress = false;
                                 that.indicadorAjaxEnCurso.hide();
                         });
                 },
-
-                /* Métodos utilizados desde 'bindEvents' */
-
                 route: function (e) {
                         var hash = window.location.hash.slice(2);
                         // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
@@ -87,47 +95,12 @@ jQuery(function ($) {
                                 window.location.reload();
                         }
                 },
-                eventWeatherInfo: function () {
-                        //Validaciones sobre los campos de entrada
-                        var erroresEntrada = false;
-                        if (!this.localidad.val()) {
-                                this.muestraValidaciones(["Es necesario especificar una localidad"]);
-                                this.localidad.focus().addClass("error-input");
-                                erroresEntrada = true;
-                        }
 
-                        if (!erroresEntrada) {
-                                this.validacionesContainer.hide();
-                                this.getWeatherInfo();
-                        }
-                },
-                eventLocalidad: function (event) {
-                        //Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
-                        this.localidad.removeClass("error-input");
+                /*
+                Métodos utilizados desde 'bindEvents'
+                */
 
-                        //Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
-                        if (event.keyCode === ENTER_KEY) {
-                                this.btoGetWeatherInfo.click();
-                                return true;
-                        }
-
-                        //Se utiliza 'event.target' en vez de 'this', ya que este en vez de hacer referencia al objeto
-                        //que ha lanzado el evento hace referenci al objeto App porque se ha invocado así: '.bind(this)'?
-                        this.txtLocalidad.text($(event.target).val());
-
-                        //Si el campo está vacío
-                        if (!$(event.target).val()) {
-                                this.txtLocalidad.text("...");
-                        }
-
-                        //Si se han introducido más de 3 caracteres se procede a buscar localidades
-                        //que coincidan con esos caracteres
-                        //FUTURE Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
-                        /*if ($(this).val().length >= 4) {
-                        getLocalidades(this);
-                        }*/
-                },
-                //Muestra mensajes de validación
+                // Muestra mensajes de validación
                 muestraValidaciones: function (arrValidaciones) {
                         //La información meteorológica anteriormente cargada se esconde
                         this.forecastContainer.hide();
@@ -142,10 +115,10 @@ jQuery(function ($) {
                         }
                 },
 
-                //Maneja los errores de la petición Ajax
-                //err = { cod, desc }
+                // Maneja los errores de la petición Ajax
+                // err = { cod, desc }
                 errorHandle: function (err) {
-                        //La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
+                        // La información meteorológica anteriormente cargada se oculta, además de los errores que se estén ya mostrando
                         this.forecastContainer.hide();
                         this.condicionesActuales.hide();
                         this.errorContainer.hide();
@@ -155,88 +128,176 @@ jQuery(function ($) {
                         this.errorContainer.html(errorMsg);
                         this.errorContainer.slideDown(200).delay(5000).slideUp(2000);
                 },
-                //Recupera la información meteorológica para la localización introducida
+                eventWeatherInfo: function () {
+                        // Validaciones sobre los campos de entrada
+                        var erroresEntrada = false;
+                        if (!this.localidad.val()) {
+                                this.muestraValidaciones(["Es necesario especificar una localidad"]);
+                                this.localidad.focus().addClass("error-input");
+                                erroresEntrada = true;
+                        }
+
+                        if (!erroresEntrada) {
+                                this.validacionesContainer.hide();
+                                this.getWeatherInfo();
+                        }
+                },
+                eventLocalidad: function (event) {
+                        // Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
+                        this.localidad.removeClass("error-input");
+
+                        // Si la tecla pulsada es un 'Intro' lanzar el evento 'click' del botón
+                        if (event.keyCode === ENTER_KEY) {
+                                this.btoGetWeatherInfo.click();
+                                return true;
+                        }
+
+                        // Se utiliza 'event.target' en vez de 'this', ya que este en vez de hacer referencia al objeto
+                        // que ha lanzado el evento hace referenci al objeto App porque se ha invocado así: '.bind(this)'?
+                        this.txtLocalidad.text($(event.target).val());
+
+                        // Si el campo está vacío
+                        if (!$(event.target).val()) {
+                                this.txtLocalidad.text("...");
+                        }
+
+                        // Si se han introducido más de 3 caracteres se procede a buscar localidades
+                        // que coincidan con esos caracteres
+                        // FUTURE Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
+                        /*
+                        if ($(this).val().length >= 4) {
+                        getLocalidades(this);
+                        }*/
+                },
+                // Recupera la información meteorológica para la localización introducida
                 getWeatherInfo: function () {
-                        //Si no hay una petición Ajax en curso se realiza una
+                        // Si no hay una petición Ajax en curso se realiza una
                         if (!ajaxInProgress) {
-                                //URL del servicio RESTful del Backend de la aplicación
+                                var     key = this.localidad.val().trim().toUpperCase(),
+                                        cachedObj = cache.responses[key],
+                                        antiguedadCache;
+
+                                // Si existe una respuesta cacheada para la misma localidad
+                                // Si existe respuesta en caché, pero esta es antigua (ej: > 1/2 hora) continuar con la ejecución de la función
+                                if (cachedObj) {
+                                        // Antiguedad en minutos
+                                        antiguedadCache = (Date.now() - new Date(cachedObj.date).getTime()) / 60000;
+                                        if (antiguedadCache <= CACHE_MINUTES) {
+                                                console.log("Utilizando respuesta anterior cacheada");
+                                                this.printWeather(cachedObj.response);
+                                                return false;
+                                        }
+                                }
+
+                                // URL del servicio RESTful del Backend de la aplicación
                                 var targetUrl = "/forecast";
 
-                                //Objecto con los datos de entrada de la petición
+                                // Objecto con los datos de entrada de la petición
                                 var datos = {
                                         formato: "json",
                                         localidad: this.localidad.val(),
                                         numDias: 4
                                 };
 
-                                //Se quiere utilizar 'this' dentro de una función [complete] de un objeto, pero la función tendrá como 'this' el objeto en el que fué creada
-                                //por lo que guardo el 'this' actual en una variable alcanzable desde dentro de la función llamada 'that'
+                                // NOTE: Se quiere utilizar 'this' dentro de una función [complete] de un objeto, pero la función tendrá como 'this' el objeto en el que fué creada
+                                // por lo que guardo el 'this' actual en una variable alcanzable desde dentro de la función llamada 'that'
                                 var that = this;
 
-                                //Configuración y llamada al servicio RESTful vía Ajax
+                                // Configuración y llamada al servicio RESTful vía Ajax
                                 $.ajax({
                                         url: targetUrl,
                                         data: datos,
                                         type: "GET",
                                         dataType: "json",
                                         cache: false,
-                                        contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
-                                        //En el contexto de una invocación Ajax, 'this' no se refiere al objeto contenedor sino a la propia llamada. Por eso 'bind(this)'
+                                        contentType: "application/x-www-form-urlencoded; charset=UTF-8", // por defecto
+                                        // En el contexto de una invocación Ajax, 'this' no se refiere al objeto contenedor sino a la propia llamada. Por eso 'bind(this)'
                                         success: this.printWeather.bind(this),
                                         error: this.errorHandle.bind(this),
-                                        //Función que se ejecuta sin importar el resultado de la petición Ajax
-                                        //CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta.
+                                        // Función que se ejecuta sin importar el resultado de la petición Ajax
+                                        // CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta.
                                         complete: function () {
 
                                         }
                                 });
-                        }// End if
+                        } // End if
                 },
-                //Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
-                //Muestra en pantalla la información meteorológica
+                // Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
+                // Muestra en pantalla la información meteorológica
                 printWeather: function (json) {
-                        //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
+                        // Si no se ha producido ningún error al tratar el objeto JSON en el Backend
                         if (json.ok) {
-                                //Si la respuesta no contiene errores
+                                // Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
-                                        //Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
-                                        //La misma función (pushState), además, genera historial
+                                        // TODO: Poner esta funcionalidad en un método a parte.
+                                        // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
+                                        // La misma función (pushState), además, genera historial
                                         var hash = window.location.hash;
                                         if (!hash || (hash === "#")) {
                                                 window.history.pushState(null, "The Weathernode", "#/" + this.localidad.val());
                                         } else {
-                                                //Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
+                                                // Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
                                                 if (hash.slice(2) !== this.localidad.val()) {
-                                                        window.history.pushState(null, "The Weathernode", hash.replace(encodeURIComponent(hash.slice(2)), this.localidad.val()));
+                                                        // NOTE: He obserbado que según el PC (mismo navegador) las URLs con espacios se codifican con %20 o no.
+                                                        // Esto es un problema, porque el método 'replace' no encuntra la cadena si tiene %20.
+                                                        // La solución es utilizar el método 'encodeURIComponent', pero si no lleva %20 tampoco lo encuentra
+                                                        // Estar atento...
+                                                        window.history.pushState(null, "The Weathernode", hash.replace(hash.slice(2), this.localidad.val()));
                                                 }
                                         }
 
-                                        //Carga del tiempo actual
+                                        // TODO: Mejorar este algoritmo. Agrupar toda esta funcionalidad en un objeto
+                                        // Cachear la respuesta del servidor (los errores no se cachean, solo las respuestas válidas)
+                                        // Si ya existe un objeto cacheado no se cahea, a no ser que sea un objeto antiguo (> CACHE_MINUTES)
+                                        var     antiguedadCache,
+                                                key = this.localidad.val().trim().toUpperCase(),
+                                                cachedObj = cache.responses[key];
+
+                                        if (cachedObj) {
+                                                antiguedadCache = (Date.now() - new Date(cachedObj.date).getTime()) / 60000;
+                                                if (antiguedadCache > CACHE_MINUTES) {
+                                                        cache.responses[key] = {
+                                                                type: FORECAST_CALL,
+                                                                date: Date(),
+                                                                response: json
+                                                        };
+                                                }
+                                        } else {
+                                                cache.responses[key] = {
+                                                        type: FORECAST_CALL,
+                                                        date: Date(),
+                                                        response: json
+                                                };
+                                        }
+
+                                        // Carga del tiempo actual
                                         this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
                                         this.estado.text(json.info.data.current_condition[0].weatherDesc[0].value);
                                         $(this.temperatura).closest("div").show();
                                         this.localidadTemperatura.text(json.info.data.request[0].query);
 
-                                        //FUTURE utilizar los siguientes datos referentes al tiempo actual
-                                        /*$("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
+                                        // FUTURE utilizar los siguientes datos referentes al tiempo actual
+                                        /*
+                                        $("#cloud-cover").text(json.info.data.current_condition[0].cloudcover + "%");
                                         $("#precipitacion").text(json.info.data.current_condition[0].precipMM + "mm");
-                                        $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");*/
+                                        $("#velocidad-viento").text(json.info.data.current_condition[0].windspeedKmph + "Km/h");
+                                        */
 
-                                        //Carga de la imagen asociada al tiempo actual
+                                        // Carga de la imagen asociada al tiempo actual
                                         this.imagenActual.attr("src", json.info.data.current_condition[0].weatherIconUrl[0].value);
 
-                                        //Presentación de la previsión meteorológica (diferentes de temperatura actual)
+                                        // Presentación de la previsión meteorológica (diferentes de temperatura actual)
                                         var jsonForecast = json.info.data.weather;
 
                                         if (jsonForecast !== undefined) {
-                                                //Se quiere utilizar 'this' dentro del bucle, pero los bucles crean sus propios 'this'
-                                                //por lo que guardo el 'this' actual en una variable alcanzable desde dentro del bucle llamada 'that'
+                                                // Se quiere utilizar 'this' dentro del bucle, pero los bucles crean sus propios 'this'
+                                                // por lo que guardo el 'this' actual en una variable alcanzable desde dentro del bucle llamada 'that'
                                                 var that = this;
                                                 this.forecastContainer.empty();
 
                                                 $.each(jsonForecast, function (key, value) {
 
-                                                        //Mostrar fecha en formato Español/España
+                                                        // Mostrar fecha en formato Español/España
                                                         var date = new Date(value.date);
                                                         var day = date.getDate();
                                                         var month = date.getMonth() + 1;
@@ -249,7 +310,7 @@ jQuery(function ($) {
                                                                 fechaFormateada = "Hoy";
                                                         }
 
-                                                        //Creo objeto de configuración de entrada para la plantilla Handlebars 'forecastTemplate'
+                                                        // Creo objeto de configuración de entrada para la plantilla Handlebars 'forecastTemplate'
                                                         var forecast = {
                                                                 imagen: value.weatherIconUrl[0].value,
                                                                 cabecera: fechaFormateada,
@@ -264,7 +325,7 @@ jQuery(function ($) {
                                                 this.forecastContainer.append("<div class='clear'></div>");
                                         }
 
-                                        //Animación para la presentación del listado de datos y la imagen
+                                        // Animación para la presentación del listado de datos y la imagen
                                         if (this.forecastContainer.is(":visible")) {
                                                 this.forecastContainer.slideUp(200).delay(200).slideDown(1000);
                                                 this.condicionesActuales.hide().slideDown("1000");
@@ -273,15 +334,16 @@ jQuery(function ($) {
                                                 this.condicionesActuales.hide().slideDown("1000");
                                         }
                                 } else {
-                                        //Se pasa el error a la función manejadora de errores
+                                        // Se pasa el error a la función manejadora de errores
                                         this.errorHandle({statusText: json.info.data.error[0].msg, status: 200});
                                 }
                         } else {
                                 this.errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});
                         }
                 }
-                //Busca las posibles localizaciones según el critério de búsqueda utilizado
-               /* getLocalidades: function (localidad) {
+                // Busca las posibles localizaciones según el critério de búsqueda utilizado
+               /*
+               getLocalidades: function (localidad) {
                     //FUTURE Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
                     //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
                     //Actualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
@@ -335,7 +397,8 @@ jQuery(function ($) {
                         //Ha habido algún problema en el servidor.
                         //Este error no se maneja (ni muestra)
                     }
-                }*/
+                }
+                */
         };
 
         App.init();

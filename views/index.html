@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 
 <head>
         <meta charset="utf-8">
@@ -10,82 +10,83 @@
 
 <body id="weatherNode">
 
-        <div class="encabezado">
-                <h1>
-                        <a href="" >
-                                <span class="title-detail-begin">El</span>Tiemp
-                                <span class="title-detail">o</span>
-                        </a>
-                </h1>
-                <h2>(The WhetherNode)</h2>
-        </div>
-        <div id="condicionesActuales" class="oculto">
-                <div class="encabezado derecha">
-                        <div class="info oculto">
-                                <span class="localidad-temperatura"></span>
-                                <span class="estado estado-temperatura"></span>
-                                <span class="temperatura temperatura-temperatura"></span>
-                        </div>
-                </div>
-                <div class="imagen-presente derecha">
-                        <img class="imagen-actual" src="">
+<div class="encabezado">
+        <h1>
+                <a href="" >
+                        <span class="title-detail-begin">El</span>Tiemp
+                        <span class="title-detail">o</span>
+                </a>
+        </h1>
+        <h2>(The WhetherNode)</h2>
+</div>
+<div id="condicionesActuales" class="oculto">
+        <div class="encabezado derecha">
+                <div class="info oculto">
+                        <span class="localidad-temperatura"></span>
+                        <span class="estado estado-temperatura"></span>
+                        <span class="temperatura temperatura-temperatura"></span>
                 </div>
         </div>
+        <div class="imagen-presente derecha">
+                <img class="imagen-actual" src="">
+        </div>
+</div>
 
-        <div class="cuerpo">
-                <div class="entrada">
-                        <!-- Mostrar un gif animado mientra se ejecuta la consulta Ajax-->
-                        <input id="localidad" type="text" placeholder="Localidad">
-                        <span id="indicadorAjaxEnCurso" class="oculto">
-                                <img src="/images/ajax-loader.gif">
-                        </span>
-                </div>
-
-                <div class="submitter-container">
-                        <span href="#" id="getWeatherInfo" class="submitter">
-                                Información meteorológica para <span class="localidad">...</span>
-                        </span>
-                </div>
-
-                <div id="forecast-container" class="oculto">
-
-                </div>
-
-                <div id="error-container" class="oculto"></div>
-                <div id="validaciones-container" class="oculto"></div>
+<div class="cuerpo">
+        <div class="entrada">
+                <!-- Mostrar un gif animado mientra se ejecuta la consulta Ajax-->
+                <input id="localidad" type="text" placeholder="Localidad">
+                <span id="indicadorAjaxEnCurso" class="oculto">
+                        <img src="/images/ajax-loader.gif">
+                </span>
         </div>
 
-        <script  id="forecast-template" type="text/x-handlebars-template">
-                <div class="resultado tiempo-actual">
+        <div class="submitter-container">
+                <span href="#" id="getWeatherInfo" class="submitter">
+                        Información meteorológica para <span class="localidad">...</span>
+                </span>
+        </div>
+
+        <div id="forecast-container" class="oculto">
+
+        </div>
+
+        <div id="error-container" class="oculto"></div>
+        <div id="validaciones-container" class="oculto"></div>
+</div>
+
+<script  id="forecast-template" type="text/x-handlebars-template">
+<div class="resultado tiempo-actual">
+        <ul>
+                <li class="cabecera">{{cabecera}}</li>
+                <li>
                         <ul>
-                                <li class="cabecera">{{cabecera}}</li>
                                 <li>
-                                        <ul>
-                                                <li>
-                                                        <img id="imagen" class="imagen-reducida" src="{{imagen}}">
-                                                </li>
-                                                <li>Temperatura:
-                                                        <span id="temperatura" class="info">{{temperatura}}</span>
-                                                </li>
-                                                <li>Estado:
-                                                        <span id="estado" class="info">{{estado}}</span>
-                                                </li>
-                                                <li>Precipitación:
-                                                        <span id="precipitacion" class="info">{{precipitacion}}</span>
-                                                </li>
-                                                <li>Velocidad del viento:
-                                                        <span id="velocidad-viento" class="info">{{velocidadViento}}</span>
-                                                </li>
-                                        </ul>
+                                        <img id="imagen" class="imagen-reducida" src="{{imagen}}">
+                                </li>
+                                <li>Temperatura:
+                                        <span id="temperatura" class="info">{{temperatura}}</span>
+                                </li>
+                                <li>Estado:
+                                        <span id="estado" class="info">{{estado}}</span>
+                                </li>
+                                <li>Precipitación:
+                                        <span id="precipitacion" class="info">{{precipitacion}}</span>
+                                </li>
+                                <li>Velocidad del viento:
+                                        <span id="velocidad-viento" class="info">{{velocidadViento}}</span>
                                 </li>
                         </ul>
-                </div>
-        </script>
+                </li>
+        </ul>
+</div>
+</script>
 
-        <script src="javascripts/jquery-2.1.0.js"></script>
-        <!-- Handlebars: Template Engine-->
-        <script src="javascripts/handlebars-v1.3.0.js"></script>
-        <script src="javascripts/clientApp.js"></script>
+<script src="javascripts/jquery-2.1.0.js"></script>
+<!-- Handlebars: Template Engine-->
+<script src="javascripts/handlebars-v1.3.0.js"></script>
+<script src="javascripts/clientApp.js"></script>
+
 </body>
 
 </html>
