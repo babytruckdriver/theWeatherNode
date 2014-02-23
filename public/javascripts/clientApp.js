@@ -27,30 +27,45 @@ jQuery(function ($) {
                                         {short: "S", complete: "Sábado"}];
                         return dias[numDia];
                 },
+                // Cachea respuestas de servidor en LocalStorage (HTML5)
                 // Funcionalidad para el cacheo de respuestas Ajax
                 cache: {
-                        CACHE_MINUTES: 1,
+                        CACHE_MINUTES: 0.1, //0 significa 'sin caché'
                         responses: {},
                         setResponse: function (key, obj) {
-                                //Si no existe lo crea.
-                                if (!this.responses[key]) {
-                                        this.responses[key] = obj;
+                                // Si no existe el objecto lo crea.
+                                if (!localStorage.getItem(key)) {
+                                        // En 'localStorage' se almacena la serialización de un objeto (toString), por lo que lo serializa antes para que se almacene correctamente (JSON.stringify)
+                                        localStorage.setItem(key, JSON.stringify(obj));
                                 }
                         },
                         getResponse: function (key) {
-                                var antiguedadCache;
+                                var antiguedadCache, obj;
                                 // Retorna el objeto solo si existe y no es más antigo que CACHE_MINUTES
                                 // En caso de ser antiguo lo borra
-                                if (this.responses[key]) {
-                                        antiguedadCache = (Date.now() - new Date(this.responses[key].date).getTime()) / 60000;
+                                if (localStorage.getItem(key)) {
+                                        obj = JSON.parse(localStorage.getItem(key));
+                                        antiguedadCache = (Date.now() - new Date(obj.date).getTime()) / 60000;
                                         if (antiguedadCache <= this.CACHE_MINUTES) {
-                                                return this.responses[key];
+                                                return obj;
                                         } else {
-                                                delete this.responses[key];
+                                                localStorage.removeItem(key);
+                                                // Cada vez que caduque una respuesta hacer un barrido en busca de más respuestas caducadas
+                                                this.deleteObsoleteResponses();
                                         }
-
                                 }
                                 return undefined;
+                        },
+                        // Recorre las propiedades del objeto 'responses' y borra las que están caducadas según CACHE_MINUTES
+                        deleteObsoleteResponses: function () {
+                                var property, antiguedadCache, obj;
+                                for(property in localStorage){
+                                        obj = JSON.parse(localStorage.getItem(property));
+                                        antiguedadCache = (Date.now() - new Date(obj.date).getTime()) / 60000;
+                                        if (antiguedadCache > this.CACHE_MINUTES) {
+                                               localStorage.removeItem(property);
+                                        }
+                                };
                         }
                 },
                 // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
