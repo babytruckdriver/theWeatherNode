@@ -9,16 +9,10 @@ jQuery(function ($) {
         var     ajaxInProgress = false,
                 ENTER_KEY = 13;
 
-        //Tipos de llamadas Ajax y tiempo de cacheo de respuestas
+        // Tipos de llamadas Ajax y tiempo de cacheo de respuestas
+        // FUTURE: Estas variables se utilizarán cuando haya diferentes tipos de peticiones Ajax. Por el momento solo hay una
         var     FORECAST_CALL = 0,
-                LOCALIDAD_CALL = 1,
-                CACHE_MINUTES = 1;
-
-        //TODO: Terminar de implementar esta funcionalidad añadiendo métodos y propiedades al objeto
-        // La información meteorológica se actualiza cada 3-4 horas, por lo que cacheamos durante 1/2 hora la información en el cliente
-        var cache = {
-                responses: {}
-        };
+                LOCALIDAD_CALL = 1;
 
         // Objeto contenedor de utilidades.
         // Estas funciones, si su uso es lo suficientemente común, podrían ir en un archivo '.js' a parte.
@@ -32,6 +26,49 @@ jQuery(function ($) {
                                         {short: "V", complete: "Viernes"},
                                         {short: "S", complete: "Sábado"}];
                         return dias[numDia];
+                },
+                // Funcionalidad para el cacheo de respuestas Ajax
+                cache: {
+                        CACHE_MINUTES: 1,
+                        responses: {},
+                        setResponse: function (key, obj) {
+                                //Si no existe lo crea.
+                                if (!this.responses[key]) {
+                                        this.responses[key] = obj;
+                                }
+                        },
+                        getResponse: function (key) {
+                                var antiguedadCache;
+                                // Retorna el objeto solo si existe y no es más antigo que CACHE_MINUTES
+                                // En caso de ser antiguo lo borra
+                                if (this.responses[key]) {
+                                        antiguedadCache = (Date.now() - new Date(this.responses[key].date).getTime()) / 60000;
+                                        if (antiguedadCache <= this.CACHE_MINUTES) {
+                                                return this.responses[key];
+                                        } else {
+                                                delete this.responses[key];
+                                        }
+
+                                }
+                                return undefined;
+                        }
+                },
+                // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
+                // La misma función (pushState), además, genera historial
+                historyHandler: function (newHash) {
+                        var hash = window.location.hash;
+                        if (!hash || (hash === "#")) {
+                                window.history.pushState(null, "The Weathernode", "#/" + newHash);
+                        } else {
+                                // Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
+                                if (hash.slice(2) !== newHash) {
+                                        // NOTE: He obserbado que según el PC (mismo navegador) las URLs con espacios se codifican con %20 o no.
+                                        // Esto es un problema, porque el método 'replace' no encuntra la cadena si tiene %20.
+                                        // La solución es utilizar el método 'encodeURIComponent', pero si no lleva %20 tampoco lo encuentra
+                                        // Estar atento...
+                                        window.history.pushState(null, "The Weathernode", hash.replace(hash.slice(2), newHash));
+                                }
+                        }
                 }
         };
 
@@ -90,6 +127,7 @@ jQuery(function ($) {
                                 this.txtLocalidad.text(hash);
                                 this.btoGetWeatherInfo.click();
                         } else if (this.localidad.val()) {
+                                //Si está relleno el input de localidad y no hay hash es porque se ha pulsado -F5-, así que se resetea la aplicación y se refresca la página
                                 this.localidad.val("");
                                 this.txtLocalidad.text("...");
                                 window.location.reload();
@@ -174,19 +212,13 @@ jQuery(function ($) {
                         // Si no hay una petición Ajax en curso se realiza una
                         if (!ajaxInProgress) {
                                 var     key = this.localidad.val().trim().toUpperCase(),
-                                        cachedObj = cache.responses[key],
-                                        antiguedadCache;
+                                        cachedObj = util.cache.getResponse(key);
 
-                                // Si existe una respuesta cacheada para la misma localidad
-                                // Si existe respuesta en caché, pero esta es antigua (ej: > 1/2 hora) continuar con la ejecución de la función
+                                // Si existe una respuesta cacheada para la misma localidad utilizar los datos cacheados
+                                // Si la respuesta cacheada sí existe pero no está vigente (es antigua), util.cache no habrá devuelvo respuesta
                                 if (cachedObj) {
-                                        // Antiguedad en minutos
-                                        antiguedadCache = (Date.now() - new Date(cachedObj.date).getTime()) / 60000;
-                                        if (antiguedadCache <= CACHE_MINUTES) {
-                                                console.log("Utilizando respuesta anterior cacheada");
-                                                this.printWeather(cachedObj.response);
-                                                return false;
-                                        }
+                                        this.printWeather(cachedObj.response);
+                                        return false;
                                 }
 
                                 // URL del servicio RESTful del Backend de la aplicación
@@ -229,46 +261,17 @@ jQuery(function ($) {
                         if (json.ok) {
                                 // Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
-                                        // TODO: Poner esta funcionalidad en un método a parte.
-                                        // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
-                                        // La misma función (pushState), además, genera historial
-                                        var hash = window.location.hash;
-                                        if (!hash || (hash === "#")) {
-                                                window.history.pushState(null, "The Weathernode", "#/" + this.localidad.val());
-                                        } else {
-                                                // Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
-                                                if (hash.slice(2) !== this.localidad.val()) {
-                                                        // NOTE: He obserbado que según el PC (mismo navegador) las URLs con espacios se codifican con %20 o no.
-                                                        // Esto es un problema, porque el método 'replace' no encuntra la cadena si tiene %20.
-                                                        // La solución es utilizar el método 'encodeURIComponent', pero si no lleva %20 tampoco lo encuentra
-                                                        // Estar atento...
-                                                        window.history.pushState(null, "The Weathernode", hash.replace(hash.slice(2), this.localidad.val()));
-                                                }
-                                        }
+                                        //Actualizar hash e historial
+                                        util.historyHandler(this.localidad.val().trim().toLocaleLowerCase());
 
-                                        // TODO: Mejorar este algoritmo. Agrupar toda esta funcionalidad en un objeto
                                         // Cachear la respuesta del servidor (los errores no se cachean, solo las respuestas válidas)
-                                        // Si ya existe un objeto cacheado no se cahea, a no ser que sea un objeto antiguo (> CACHE_MINUTES)
-                                        var     antiguedadCache,
-                                                key = this.localidad.val().trim().toUpperCase(),
-                                                cachedObj = cache.responses[key];
-
-                                        if (cachedObj) {
-                                                antiguedadCache = (Date.now() - new Date(cachedObj.date).getTime()) / 60000;
-                                                if (antiguedadCache > CACHE_MINUTES) {
-                                                        cache.responses[key] = {
-                                                                type: FORECAST_CALL,
-                                                                date: Date(),
-                                                                response: json
-                                                        };
-                                                }
-                                        } else {
-                                                cache.responses[key] = {
-                                                        type: FORECAST_CALL,
-                                                        date: Date(),
-                                                        response: json
-                                                };
-                                        }
+                                        // Si la respuesta ya está cacheada y está vigente (no es antigua) esta nos e cacheará. Esta funcionalidad se implementa en util.cache
+                                        var key = this.localidad.val().trim().toUpperCase();
+                                        util.cache.setResponse(key, {
+                                                type: FORECAST_CALL,
+                                                date: Date(),
+                                                response: json
+                                        });
 
                                         // Carga del tiempo actual
                                         this.temperatura.text(json.info.data.current_condition[0].temp_C + "Cº");
