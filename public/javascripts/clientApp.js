@@ -30,8 +30,7 @@ jQuery(function ($) {
                 // Cachea respuestas de servidor en LocalStorage (HTML5)
                 // Funcionalidad para el cacheo de respuestas Ajax
                 cache: {
-                        CACHE_MINUTES: 0.1, //0 significa 'sin caché'
-                        responses: {},
+                        CACHE_MINUTES: 5, //0 significa 'sin caché's
                         setResponse: function (key, obj) {
                                 // Si no existe el objecto lo crea.
                                 if (!localStorage.getItem(key)) {
@@ -40,14 +39,15 @@ jQuery(function ($) {
                                 }
                         },
                         getResponse: function (key) {
-                                var antiguedadCache, obj;
+                                var     antiguedadCache,
+                                        objStored = localStorage.getItem(key);
                                 // Retorna el objeto solo si existe y no es más antigo que CACHE_MINUTES
                                 // En caso de ser antiguo lo borra
-                                if (localStorage.getItem(key)) {
-                                        obj = JSON.parse(localStorage.getItem(key));
-                                        antiguedadCache = (Date.now() - new Date(obj.date).getTime()) / 60000;
+                                if (objStored) {
+                                        objStored = JSON.parse(objStored);
+                                        antiguedadCache = (Date.now() - new Date(objStored.date).getTime()) / 60000;
                                         if (antiguedadCache <= this.CACHE_MINUTES) {
-                                                return obj;
+                                                return objStored;
                                         } else {
                                                 localStorage.removeItem(key);
                                                 // Cada vez que caduque una respuesta hacer un barrido en busca de más respuestas caducadas
@@ -56,7 +56,7 @@ jQuery(function ($) {
                                 }
                                 return undefined;
                         },
-                        // Recorre las propiedades del objeto 'responses' y borra las que están caducadas según CACHE_MINUTES
+                        // Recorre las propiedades de localStorage y borra las que están caducadas según CACHE_MINUTES
                         deleteObsoleteResponses: function () {
                                 var key, antiguedadCache, obj;
                                 for (key in localStorage) {
