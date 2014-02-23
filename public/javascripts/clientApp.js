@@ -58,14 +58,16 @@ jQuery(function ($) {
                         },
                         // Recorre las propiedades del objeto 'responses' y borra las que están caducadas según CACHE_MINUTES
                         deleteObsoleteResponses: function () {
-                                var property, antiguedadCache, obj;
-                                for(property in localStorage){
-                                        obj = JSON.parse(localStorage.getItem(property));
-                                        antiguedadCache = (Date.now() - new Date(obj.date).getTime()) / 60000;
-                                        if (antiguedadCache > this.CACHE_MINUTES) {
-                                               localStorage.removeItem(property);
+                                var key, antiguedadCache, obj;
+                                for (key in localStorage) {
+                                        if (typeof localStorage[key] !== "function" && localStorage.hasOwnProperty(key)) {
+                                                obj = JSON.parse(localStorage.getItem(key));
+                                                antiguedadCache = (Date.now() - new Date(obj.date).getTime()) / 60000;
+                                                if (antiguedadCache > this.CACHE_MINUTES) {
+                                                        localStorage.removeItem(key);
+                                                }
                                         }
-                                };
+                                }
                         }
                 },
                 // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
