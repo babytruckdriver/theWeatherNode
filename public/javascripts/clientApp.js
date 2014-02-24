@@ -34,7 +34,8 @@ jQuery(function ($) {
                         setResponse: function (key, obj) {
                                 // Si no existe el objecto lo crea.
                                 if (!localStorage.getItem(key)) {
-                                        // En 'localStorage' se almacena la serialización de un objeto (toString), por lo que lo serializa antes para que se almacene correctamente (JSON.stringify)
+                                        // En 'localStorage' se almacena la serialización de un objeto (toString),
+                                        // por lo que lo serializa antes para que se almacene correctamente (JSON.stringify)
                                         localStorage.setItem(key, JSON.stringify(obj));
                                 }
                         },
