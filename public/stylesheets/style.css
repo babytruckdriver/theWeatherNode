@@ -47,7 +47,7 @@ a:link,:visited {
 	margin-bottom: 40px;
     -moz-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
     -webkit-box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 2px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
+    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 2px;
 	border-radius: 0 0 5px 5px;
 }
 
