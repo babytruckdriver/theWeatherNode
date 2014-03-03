@@ -221,6 +221,14 @@
                                 if (!$(event.target).val()) {
                                         this.txtLocalidad.text("...");
                                 }
+
+                                // Si se han introducido más de 3 caracteres se procede a buscar localidades
+                                // que coincidan con esos caracteres
+                                // FUTURE Descomentar cuando se sepa qué hacer con la lista de localidades devueltas
+                                /*
+                                if ($(this).val().length >= 4) {
+                                getLocalidades(this);
+                                }*/
                         },
                         // Recupera la información meteorológica para la localización introducida
                         getWeatherInfo: function () {
@@ -358,7 +366,69 @@
                                 } else {
                                         this.errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});
                                 }
+<<<<<<< HEAD
                         }
+=======
+                        }
+                        // Busca las posibles localizaciones según el critério de búsqueda utilizado
+                       /*
+                       getLocalidades: function (localidad) {
+                            //FUTURE Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
+                            //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
+                            //Actualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
+
+                            if (!app.ajaxInProgress) {
+                                var targetUrl = "/location";
+
+                                //Objecto con los datos de entrada de la petición
+                                var datos = {
+                                    formato: "json",
+                                    localidad: $(localidad).val()
+                                };
+
+                                app.ajaxInProgress = true;
+                                $("#indicadorAjaxEnCurso").show();
+                                setTimeout(1000);
+                                //Configuración y llamada al servicio RESTful vía Ajax
+                                $.ajax({
+                                    url: targetUrl,
+                                    data: datos,
+                                    type: "GET",
+                                    dataType: "json",
+                                    cache: false,
+                                    contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
+                                    success: printLocationHelper,
+                                    error: errorHandle,
+                                    //Función que se ejecuta sin importar el resultado de la petición Ajax
+                                    //FUTURE He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
+                                    complete: function () {
+                                        console.log("Petición Ajax realizada.");
+                                        this.ajaxInProgress = false;
+                                        $("#indicadorAjaxEnCurso").hide();
+                                    }
+                                });
+                            }
+                        },
+
+                        //Muestra las posibles localizaciones según el critério de búsqueda utilizado
+                        printLocationHelper: function(json) {
+                            //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
+                            if (json.ok) {
+                                //Si la respuesta no contiene errores
+                                if (json.info.data == undefined) {
+                                    //FUTURE hacer algo con los resultados obtenidos de buscar localidades según se va escribiendo
+                                    //json.info.search_api.result[0].areaName[0].value);
+                                } else {
+                                    //No se encuentran localidades con los datoa introducidos.
+                                    //Este error no se maneja (ni muestra)
+                                }
+                            } else {
+                                //Ha habido algún problema en el servidor.
+                                //Este error no se maneja (ni muestra)
+                            }
+                        }
+                        */
+>>>>>>> 339d96cca5ece16939e938d673441a17331d1d78
                 };
 
                 App.init();
