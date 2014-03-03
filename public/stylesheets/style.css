@@ -15,13 +15,14 @@ body {
 	color: #333333;
 	width: 520px;
 	margin: 0 auto;
-	-webkit-font-smoothing: antialiased;
 }
 
 h2 {
     color: #000;
 
 }
+
+/* Quito los estilos por defecto de las listas desordenadas*/
 
 ul {
     list-style-type: none;
