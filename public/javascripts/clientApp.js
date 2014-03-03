@@ -272,7 +272,6 @@
                                                 // Función que se ejecuta sin importar el resultado de la petición Ajax
                                                 // CHANGES He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta.
                                                 complete: function () {
-
                                                 }
                                         });
                                 } // End if
@@ -367,64 +366,7 @@
                                         this.errorHandle({statusText: "Ha ocurrido un problema al recuperar la información.", status: 500});
                                 }
                         }
-                        // Busca las posibles localizaciones según el critério de búsqueda utilizado
-                       /*
-                       getLocalidades: function (localidad) {
-                            //FUTURE Si con una consulta no ha encontrado nada no llamar de nuevo al servicio hasta que la consulta se modifique.
-                            //Ej: 'casavo' no encuentra nada. 'casavoo' no buscarlo poque no va a encontrar nada tampoco.
-                            //Actualización: Estudiar el comportamiento del servicio, porque creo que no funciona como describo arriba
 
-                            if (!app.ajaxInProgress) {
-                                var targetUrl = "/location";
-
-                                //Objecto con los datos de entrada de la petición
-                                var datos = {
-                                    formato: "json",
-                                    localidad: $(localidad).val()
-                                };
-
-                                app.ajaxInProgress = true;
-                                $("#indicadorAjaxEnCurso").show();
-                                setTimeout(1000);
-                                //Configuración y llamada al servicio RESTful vía Ajax
-                                $.ajax({
-                                    url: targetUrl,
-                                    data: datos,
-                                    type: "GET",
-                                    dataType: "json",
-                                    cache: false,
-                                    contentType: "application/x-www-form-urlencoded; charset=UTF-8", //por defecto
-                                    success: printLocationHelper,
-                                    error: errorHandle,
-                                    //Función que se ejecuta sin importar el resultado de la petición Ajax
-                                    //FUTURE He comprobado que si se produce una excepción en la función 'success' la función 'complete' no se ejecuta. Investigar.
-                                    complete: function () {
-                                        console.log("Petición Ajax realizada.");
-                                        this.ajaxInProgress = false;
-                                        $("#indicadorAjaxEnCurso").hide();
-                                    }
-                                });
-                            }
-                        },
-
-                        //Muestra las posibles localizaciones según el critério de búsqueda utilizado
-                        printLocationHelper: function(json) {
-                            //Si no se ha producido ningún error al tratar el objeto JSON en el Backend
-                            if (json.ok) {
-                                //Si la respuesta no contiene errores
-                                if (json.info.data == undefined) {
-                                    //FUTURE hacer algo con los resultados obtenidos de buscar localidades según se va escribiendo
-                                    //json.info.search_api.result[0].areaName[0].value);
-                                } else {
-                                    //No se encuentran localidades con los datoa introducidos.
-                                    //Este error no se maneja (ni muestra)
-                                }
-                            } else {
-                                //Ha habido algún problema en el servidor.
-                                //Este error no se maneja (ni muestra)
-                            }
-                        }
-                        */
                 };
 
                 App.init();
