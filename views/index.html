@@ -38,6 +38,7 @@
         <article>
                 <section class="entrada">
                         <input id="localidad" type="search" list="localidades" placeholder="Localidad">
+                        <img id="getWeatherInfo" alt="Buscar" width="23px" height="23px" src="images/find.png">
                         <!-- //TODO: Ir añadiendo las localidades consultadas a la lista para facilitar una posible búsqueda futura-->
                         <!-- //TODO: Quizá sería bueno guardar esta información en localStorage-->
                         <datalist id="localidades">
@@ -48,12 +49,6 @@
                         <!-- Mostrar un gif animado mientra se ejecuta la consulta Ajax-->
                         <span id="indicadorAjaxEnCurso" class="oculto">
                                 <img src="/images/ajax-loader.gif">
-                        </span>
-                </section>
-
-                <section class="submitter-container">
-                        <span href="#" id="getWeatherInfo" class="submitter">
-                                Información meteorológica para <span class="localidad">...</span>
                         </span>
                 </section>
         </article>

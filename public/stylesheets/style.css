@@ -2,224 +2,181 @@
     Estilos globales
 */
 
-html, body {
-    margin: 0;
-    padding: 0;
-    /*padding: 50px;*/
-}
-
+html,
 body {
-	font: 14px "Helvetica Neue", Helvetica, Arial, sans-serif;
-	line-height: 1.4em;
-	background: #eeeeee;
-	color: #333333;
-	width: 520px;
-	margin: 0 auto;
+        margin: 0;
+        padding: 0;
+        /*padding: 50px;*/
 }
-
+body {
+        font: 14px"Helvetica Neue", Helvetica, Arial, sans-serif;
+        line-height: 1.4em;
+        background: #eeeeee;
+        color: #333333;
+        width: 520px;
+        margin: 0 auto;
+}
 h2 {
-    color: #000;
-
+        color: #000;
 }
-
 /* Quito los estilos por defecto de las listas desordenadas*/
 
 ul {
-    list-style-type: none;
-    /* Quita las tabulaciones por defecto de las listas */
-    margin: 0;
-    padding: 0;
+        list-style-type: none;
+        /* Quita las tabulaciones por defecto de las listas */
+        margin: 0;
+        padding: 0;
 }
-
 /* Quito los estilos por defecto que pudieran tener los links*/
 
-a:link,:visited {
-    text-decoration:none;
-    border: none;
-    color: #000;
+a:link,
+:visited {
+        text-decoration: none;
+        border: none;
+        color: #000;
 }
-
 /*
     Estilos específicos de la aplicación
 */
+
 #weatherNode {
-	background: #fff;
-	padding: 20px;
-	margin-bottom: 40px;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 2px;
-	border-radius: 0 0 5px 5px;
+        background: #fff;
+        padding: 20px;
+        margin-bottom: 40px;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 2px;
+        border-radius: 0 0 5px 5px;
 }
-
 /*
-    Estilos botón de búsqueda
+    Estilos link de búsqueda
 */
-span.submitter {
-	display: block; 
-    width: 380px; /* Si no se le da ancho el centrado (margin) no funciona */
-    /*height: 30px; */
-	padding:10px 10px 10px 10px;  
-    margin: 0 auto; /* centra en la página */   
-    
-	background: #2E9AFE; /* old browsers */
-	background: -moz-linear-gradient(top, #FFFFFF 0%, #A9D0F5 100%); /* firefox */
-	background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#FFFFFF), color-stop(100%,#A9D0F5)); /* webkit */    
-    
-	box-shadow: inset 0 0 6px #fff;
-	border: 1px solid #A9D0F5;
-	border-radius: 10px;
-    
-	text-transform: uppercase; text-decoration: none;
-	color: #81BEF7;
-	text-shadow: 0 1px 2px #FFFFFF;
-    text-align: center;
+
+#getWeatherInfo {
+        position: relative;
+        top: 4px;
 }
 
-span.submitter:hover {
-    color: #045FB4;
-    -moz-transition: color 0.25s ease-in-out;
-    -webkit-transition: color 0.25s ease-in-out;
-    transition: color 0.25s ease-in-out;
-    cursor: pointer;
+#getWeatherInfo:hover {
+        transform: scale(1.2);
 }
 
 /* Otros estilos */
 
 div#error-container {
-    background: #F5A9A9;  
-    color: white;
-    width: 90%; /* Si no se le da ancho el centrado (margin) no funciona */
-    /*height: 30px; */
-	padding: 10px 10px 10px 10px;  
-    margin: 10px auto; /* centra en la página */ 
-    
-    text-align: center;
-    border-radius: 5px;
+        background: #F5A9A9;
+        color: white;
+        width: 90%;
+        /* Si no se le da ancho el centrado (margin) no funciona */
+        /*height: 30px; */
+        padding: 10px 10px 10px 10px;
+        margin: 10px auto;
+        /* centra en la página */
+        text-align: center;
+        border-radius: 5px;
 }
-
 #validaciones-container {
-    background: #F5A9A9;  
-    color: white;
-    width: 90%; /* Si no se le da ancho el centrado (margin) no funciona */
-    /*height: 30px;*/
-	padding: 10px 10px 10px 10px; 
-    margin: 10px auto; /* centra en la página */ 
-    
-    text-align: center;
-    border-radius: 5px;
+        background: #F5A9A9;
+        color: white;
+        width: 90%;
+        /* Si no se le da ancho el centrado (margin) no funciona */
+        /*height: 30px;*/
+        padding: 10px 10px 10px 10px;
+        margin: 10px auto;
+        /* centra en la página */
+        text-align: center;
+        border-radius: 5px;
 }
-
-
-
 .encabezado {
-    width: 200px; /*Las columnas que crea esta clase deben extenderse hasta ocupar el 100% del contenedor*/
-    float: left;
-    /*display: inline-block;*/
-    margin: 0;
-    padding: 2px;
+        width: 200px;
+        /*Las columnas que crea esta clase deben extenderse hasta ocupar el 100% del contenedor*/
+        float: left;
+        /*display: inline-block;*/
+        margin: 0;
+        padding: 2px;
 }
-
 .imagen-presente {
-    float: left;
-    width: 100px;
-    /*display: inline-block;*/
-    margin: 0;
-    padding: 2px;
+        float: left;
+        width: 100px;
+        /*display: inline-block;*/
+        margin: 0;
+        padding: 2px;
 }
-
-
 .cuerpo {
-    clear: both;
+        clear: both;
 }
-
 .entrada {
-    margin: 10px;
+        margin: 10px;
 }
-
-.error-input{
-    background: #F5A9A9;  
+.error-input {
+        background: #F5A9A9;
 }
-
 .clear {
-    clear: both;
+        clear: both;
 }
-
 .info {
-    font-weight: bold;
+        font-weight: bold;
 }
-
 .title-detail {
-    color: #D7DF01;
-    box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
+        color: #D7DF01;
+        box-shadow: rgba(0, 0, 0, 0.2) 0 2px 6px 0;
 }
-
 .title-detail-begin {
-    font-style: italic;   
+        font-style: italic;
 }
-
 .estado-temperatura {
-    font-size: 1em;   
-    display: block;
+        font-size: 1em;
+        display: block;
 }
-
 .temperatura-temperatura {
-    display: block;
-    font-size: 4em;
-    line-height: 48px; /* amplia la altura para que entre el tamñaño de letra */
+        display: block;
+        font-size: 4em;
+        line-height: 48px;
+        /* amplia la altura para que entre el tamñaño de letra */
 }
-
 .localidad {
-    font-weight: bold;
+        font-weight: bold;
 }
-
 .imagen-actual {
-    opacity: 0.6;
-    border-radius: 5px 5px 5px 5px;
-    transform: scale(1.5);
-    -webkit-transform: scale(1.5);
+        opacity: 0.6;
+        border-radius: 5px 5px 5px 5px;
+        transform: scale(1.5);
+        -webkit-transform: scale(1.5);
 }
-
 .imagen-reducida {
-    opacity: 0.6;
-    border-radius: 5px 5px 5px 5px;
-    transform: scale(1);
+        opacity: 0.6;
+        border-radius: 5px 5px 5px 5px;
+        transform: scale(1);
 }
-
 .derecha {
-    text-align: right;
+        text-align: right;
 }
 .oculto {
-    display: none;   
+        display: none;
 }
-
 /*
     Estilos de la sección de información
 */
+
 .resultado {
-    float: left;
-    width: 25%;
-    padding: 5px;
-    
-    /* Este estilo hace que el 'padding' no añada tamaño al alemento (no sumando más del 100%) */
-    -moz-box-sizing: border-box;
-    -webkit-box-sizing: border-box;
-    box-sizing: border-box;    
+        float: left;
+        width: 25%;
+        padding: 5px;
+        /* Este estilo hace que el 'padding' no añada tamaño al alemento (no sumando más del 100%) */
+        -moz-box-sizing: border-box;
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
 }
-
 .tiempo-actual {
-    font-size: 11px;
+        font-size: 11px;
 }
-
-.submitter-container {
-    margin: 10px;
-}
-
 .cabecera {
-    font-weight: bold;
-    padding: 5px;
+        font-weight: bold;
+        padding: 5px;
 }
-
 .localidad-temperatura {
-    font-size: 1em;   
-    display: block;    
-    color: #A4A4A4; 
+        font-size: 1em;
+        display: block;
+        color: #A4A4A4;
+}
+#localidad {
+        padding: 2px 6px;
 }
