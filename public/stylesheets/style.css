@@ -16,6 +16,9 @@ body {
         width: 520px;
         margin: 0 auto;
 }
+h1 {
+        font-size: 2em;
+}
 h2 {
         color: #000;
 }
@@ -180,3 +183,12 @@ div#error-container {
 #localidad {
         padding: 2px 6px;
 }
+
+/*@media all and (max-width: 767px) {
+        h1 {
+
+                font-size: 3em;
+
+        }
+
+}*/

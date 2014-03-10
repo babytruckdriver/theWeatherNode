@@ -1,4 +1,4 @@
-theWheatherNode
+theWeatherNode
 ===============
 
 Just another weather forecast webapp for practice jQuery, Handlebars and Node + Express.
