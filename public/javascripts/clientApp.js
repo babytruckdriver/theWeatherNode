@@ -130,6 +130,8 @@ jQuery(function ($) {
 
                         // Al clicar el botón se consulta el tiempo para la localidad indicada
                         this.btoGetWeatherInfo.on("click", this.eventWeatherInfo.bind(this));
+                        this.btoGetWeatherInfo.on("mouseover", this.eventMuestraBuscar.bind(this));
+                        this.localidad.on("click", this.eventMuestraBuscar.bind(this))
                         this.localidad.on("keyup", this.eventLocalidad.bind(this));
 
                         // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
@@ -241,6 +243,10 @@ jQuery(function ($) {
                         if ($(this).val().length >= 4) {
                         getLocalidades(this);
                         }*/
+                },
+
+                eventMuestraBuscar: function (event) {
+                        this.localidad.css("width", "100%");
                 },
 
                 // Recupera la información meteorológica para la localización introducida
