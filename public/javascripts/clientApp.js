@@ -25,16 +25,19 @@ jQuery(function ($) {
                                         {short: "J", complete: "Jueves"},
                                         {short: "V", complete: "Viernes"},
                                         {short: "S", complete: "Sábado"}
-                                   ];
+                                        ];
                         return dias[numDia];
                 },
+
                 // Cachea respuestas de servidor en LocalStorage (HTML5)
                 // Funcionalidad para el cacheo de respuestas Ajax
                 cache: {
-                        CACHE_MINUTES: 5, //0 significa 'sin caché's
+                        CACHE_MINUTES: 5, //0 significa 'sin caché'
                         setResponse: function (key, obj) {
+
                                 // Si no existe el objecto lo crea.
                                 if (!localStorage.getItem(key)) {
+
                                         // En 'localStorage' se almacena la serialización de un objeto (toString), por lo que lo serializa antes para que se almacene correctamente (JSON.stringify)
                                         localStorage.setItem(key, JSON.stringify(obj));
                                 }
@@ -42,6 +45,7 @@ jQuery(function ($) {
                         getResponse: function (key) {
                                 var     antiguedadCache,
                                         objStored = localStorage.getItem(key);
+
                                 // Retorna el objeto solo si existe y no es más antigo que CACHE_MINUTES
                                 // En caso de ser antiguo lo borra
                                 if (objStored) {
@@ -51,12 +55,14 @@ jQuery(function ($) {
                                                 return objStored;
                                         } else {
                                                 localStorage.removeItem(key);
+
                                                 // Cada vez que caduque una respuesta hacer un barrido en busca de más respuestas caducadas
                                                 this.deleteObsoleteResponses();
                                         }
                                 }
                                 return undefined;
                         },
+
                         // Recorre las propiedades de localStorage y borra las que están caducadas según CACHE_MINUTES
                         deleteObsoleteResponses: function () {
                                 var key, antiguedadCache, obj;
@@ -71,6 +77,7 @@ jQuery(function ($) {
                                 }
                         }
                 },
+
                 // Se modifica la URL con la localidad consultada con el fin de que el enlace pueda ser almacenado como marcador/favorito
                 // La misma función (pushState), además, genera historial
                 historyHandler: function (newHash) {
@@ -78,8 +85,10 @@ jQuery(function ($) {
                         if (!hash || (hash === "#")) {
                                 window.history.pushState(null, "The Weathernode", "#/" + newHash);
                         } else {
+
                                 // Si se está consultando la misma localidad (o se ha recargado la página -F5-) no se desea guardar en historial
                                 if (hash.slice(2) !== newHash) {
+
                                         // NOTE: He obserbado que según el PC (mismo navegador) las URLs con espacios se codifican con %20 o no.
                                         // Esto es un problema, porque el método 'replace' no encuntra la cadena si tiene %20.
                                         // La solución es utilizar el método 'encodeURIComponent', pero si no lleva %20 tampoco lo encuentra
@@ -92,6 +101,7 @@ jQuery(function ($) {
 
         var App = {
                 init: function () {
+
                         // Poner el foco en el primer campo de entrada visible
                         $("body").find("input[type=text]:visible:first").focus();
                         this.cacheElements();
@@ -117,9 +127,11 @@ jQuery(function ($) {
                         this.txtLocalidad = this.cuerpo.find(".localidad");
                 },
                 bindEvents: function () {
+
                         // Al clicar el botón se consulta el tiempo para la localidad indicada
                         this.btoGetWeatherInfo.on("click", this.eventWeatherInfo.bind(this));
                         this.localidad.on("keyup", this.eventLocalidad.bind(this));
+
                         // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
                         this.localidad.on("click", function (event) {
                                 $(event.target).removeClass("error-input");
@@ -139,12 +151,14 @@ jQuery(function ($) {
                 },
                 route: function (e) {
                         var hash = window.location.hash.slice(2);
+
                         // Si en la URL se informa una localidad buscar directamente la previsión sobre la misma. Ej: /#/madrid
                         if (hash.length) {
                                 this.localidad.val(hash);
                                 this.txtLocalidad.text(hash);
                                 this.btoGetWeatherInfo.click();
                         } else if (this.localidad.val()) {
+
                                 //Si está relleno el input de localidad y no hay hash es porque se ha pulsado -F5-, así que se resetea la aplicación y se refresca la página
                                 this.localidad.val("");
                                 this.txtLocalidad.text("...");
@@ -158,6 +172,7 @@ jQuery(function ($) {
 
                 // Muestra mensajes de validación
                 muestraValidaciones: function (arrValidaciones) {
+
                         //La información meteorológica anteriormente cargada se esconde
                         this.forecastContainer.hide();
                         this.condicionesActuales.hide();
@@ -185,6 +200,7 @@ jQuery(function ($) {
                         this.errorContainer.slideDown(200).delay(5000).slideUp(2000);
                 },
                 eventWeatherInfo: function () {
+
                         // Validaciones sobre los campos de entrada
                         var erroresEntrada = false;
                         if (!this.localidad.val()) {
@@ -199,6 +215,7 @@ jQuery(function ($) {
                         }
                 },
                 eventLocalidad: function (event) {
+
                         // Al comenzar a teclear en el campo de entrada quitar la alerta visual de error por campo vacío
                         this.localidad.removeClass("error-input");
 
@@ -225,6 +242,7 @@ jQuery(function ($) {
                         getLocalidades(this);
                         }*/
                 },
+
                 // Recupera la información meteorológica para la localización introducida
                 getWeatherInfo: function () {
                         // Si no hay una petición Ajax en curso se realiza una
@@ -271,13 +289,17 @@ jQuery(function ($) {
                                 });
                         } // End if
                 },
+
                 // Función que ejecuta en caso de que la petición Ajax 'getWeatherInfo' haya sido exitosa
                 // Muestra en pantalla la información meteorológica
                 printWeather: function (json) {
+
                         // Si no se ha producido ningún error al tratar el objeto JSON en el Backend
                         if (json.ok) {
+
                                 // Si la respuesta no contiene errores
                                 if (json.info.data.error === undefined) {
+
                                         //Actualizar hash e historial
                                         util.historyHandler(this.localidad.val().trim().toLocaleLowerCase());
 
@@ -310,6 +332,7 @@ jQuery(function ($) {
                                         var jsonForecast = json.info.data.weather;
 
                                         if (jsonForecast !== undefined) {
+
                                                 // Se quiere utilizar 'this' dentro del bucle, pero los bucles crean sus propios 'this'
                                                 // por lo que guardo el 'this' actual en una variable alcanzable desde dentro del bucle llamada 'that'
                                                 var that = this;
