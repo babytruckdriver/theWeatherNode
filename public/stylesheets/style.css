@@ -55,6 +55,7 @@ a:link,
 
 #getWeatherInfo {
         position: relative;
+        margin: 4px;
         cursor: pointer;
 }
 
@@ -187,7 +188,8 @@ div#error-container {
 #localidad {
         order: 2;
         padding: 2px 6px;
-        border: 0 0 1px 1px;
+        border: 1px solid;
+        border-color: #fafafa;
         width: 150px;
 
         transition: width 0.5s ease-out;
