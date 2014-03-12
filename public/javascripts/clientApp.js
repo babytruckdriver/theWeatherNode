@@ -134,10 +134,6 @@ jQuery(function ($) {
                         this.localidad.on("click", this.eventMuestraBuscar.bind(this));
                         this.localidad.on("keyup", this.eventLocalidad.bind(this));
 
-                        // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
-                        this.localidad.on("click", function (event) {
-                                $(event.target).removeClass("error-input");
-                        });
                         this.window.on("hashchange", this.route.bind(this));
 
                         // Acciones a ejecutar cuando una petición Ajax comienza y/o termina
@@ -246,6 +242,10 @@ jQuery(function ($) {
                 },
 
                 eventMuestraBuscar: function (event) {
+
+                        // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
+                        $(event.target).removeClass("error-input");
+                        this.localidad.select();
                         this.localidad.css("width", "100%");
                 },
 
