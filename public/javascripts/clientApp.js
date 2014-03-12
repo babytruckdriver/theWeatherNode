@@ -146,6 +146,36 @@ jQuery(function ($) {
                                 ajaxInProgress = false;
                                 that.indicadorAjaxEnCurso.hide();
                         });
+
+                        $(document).on("keypress", function (e) {
+                                var $selectedRow = $(".filaSel");
+                                console.log(">>" + $selectedRow.text());
+                                //TODO: if($selectedRow !== undefined)
+                                switch (e.keyCode) {
+                                        case 38: {
+                                                console.log("Subo...");
+                                                console.log(">Anterior>" + $selectedRow.prev().text());
+                                                //TODO: Mover el ratón X pixels hacia arriba
+                                                $selectedRow.prev().mouseover();
+
+                                                break;
+                                        }
+                                        case 40: {
+                                                console.log("Bajo...");
+                                                console.log(">Siguiente>" + $selectedRow.next().text());
+                                                //TODO: Mover el ratón X pixels hacia abajo
+                                                $selectedRow.next().mouseover();
+
+                                                break;
+                                        }
+                                }
+                        });
+
+                        $(".fila").on("mouseover", function () {
+                                console.log("^^" + $(this).text());
+                                $(this).siblings().removeClass("filaSel");
+                                $(this).toggleClass("filaSel");
+                        });
                 },
                 route: function (e) {
                         var hash = window.location.hash.slice(2);

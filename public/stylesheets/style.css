@@ -204,3 +204,16 @@ div#error-container {
         }
 
 }*/
+
+.fila {
+        background-color: white;
+}
+
+/*.fila:hover {
+        background-color: grey;
+}*/
+
+.filaSel {
+        background-color: grey;
+}
+
