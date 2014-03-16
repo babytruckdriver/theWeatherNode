@@ -28,6 +28,22 @@ jQuery(function ($) {
                                         ];
                         return dias[numDia];
                 },
+                getMes: function (numDia) {
+                        var dias = [    {short: "", complete: "Enero"},
+                                        {short: "", complete: "Febrero"},
+                                        {short: "", complete: "Marzo"},
+                                        {short: "", complete: "Abril"},
+                                        {short: "", complete: "Mayo"},
+                                        {short: "", complete: "Junio"},
+                                        {short: "", complete: "Julio"},
+                                        {short: "", complete: "Agosto"},
+                                        {short: "", complete: "Septiembre"},
+                                        {short: "", complete: "Octubre"},
+                                        {short: "", complete: "Noviembre"},
+                                        {short: "", complete: "Diviembre"}
+                                        ];
+                        return dias[numDia];
+                },
 
                 // Cachea respuestas de servidor en LocalStorage (HTML5)
                 // Funcionalidad para el cacheo de respuestas Ajax
@@ -146,36 +162,6 @@ jQuery(function ($) {
                                 ajaxInProgress = false;
                                 that.indicadorAjaxEnCurso.hide();
                         });
-
-                        $(document).on("keypress", function (e) {
-                                var $selectedRow = $(".filaSel");
-                                console.log(">>" + $selectedRow.text());
-                                //TODO: if($selectedRow !== undefined)
-                                switch (e.keyCode) {
-                                        case 38: {
-                                                console.log("Subo...");
-                                                console.log(">Anterior>" + $selectedRow.prev().text());
-                                                //TODO: Mover el ratón X pixels hacia arriba
-                                                $selectedRow.prev().mouseover();
-
-                                                break;
-                                        }
-                                        case 40: {
-                                                console.log("Bajo...");
-                                                console.log(">Siguiente>" + $selectedRow.next().text());
-                                                //TODO: Mover el ratón X pixels hacia abajo
-                                                $selectedRow.next().mouseover();
-
-                                                break;
-                                        }
-                                }
-                        });
-
-                        $(".fila").on("mouseover", function () {
-                                console.log("^^" + $(this).text());
-                                $(this).siblings().removeClass("filaSel");
-                                $(this).toggleClass("filaSel");
-                        });
                 },
                 route: function (e) {
                         var hash = window.location.hash.slice(2);
@@ -276,7 +262,7 @@ jQuery(function ($) {
                         // Al clicar en el campo de entrada quitar la alerta visual de error por campo vacío
                         $(event.target).removeClass("error-input");
                         this.localidad.select();
-                        this.localidad.css("width", "100%");
+                        this.localidad.css("width", "93%");
                 },
 
                 // Recupera la información meteorológica para la localización introducida
@@ -379,13 +365,16 @@ jQuery(function ($) {
                                                         // Mostrar fecha en formato Español/España
                                                         var date = new Date(value.date);
                                                         var day = date.getDate();
-                                                        var month = date.getMonth() + 1;
+                                                        var month = date.getMonth();
                                                         var year = date.getFullYear();
 
-                                                        var fechaFormateada = util.getDiaSemana(date.getDay()).complete + " " + day + "/" + month + "/" + year;
+                                                        var formatedDay = util.getDiaSemana(date.getDay()).complete;
+                                                        var formatedMonth = util.getMes(month).complete;
+                                                        var fechaFormateada = formatedDay + " " + day + " " + formatedMonth;
+
                                                         var hoy = new Date();
 
-                                                        if ((hoy.getDate() === day) && (hoy.getMonth() + 1 === month) && (hoy.getFullYear() === year)) {
+                                                        if ((hoy.getDate() === day) && (hoy.getMonth() === month) && (hoy.getFullYear() === year)) {
                                                                 fechaFormateada = "Hoy";
                                                         }
 

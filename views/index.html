@@ -11,12 +11,6 @@
 <body id="weatherNode">
 
 <article>
-        <section>
-                <div class="fila">Uno</div>
-                <div class="fila">Dos</div>
-                <div class="fila">Tres</div>
-                <div class="fila">cuatro</div>
-        </section>
         <section class="encabezado">
                 <h1>
                         <a href="" >
@@ -44,7 +38,7 @@
         <article>
                 <section class="entrada">
                         <input id="localidad" type="search" list="localidades" placeholder="Localidad">
-                        <img id="getWeatherInfo" alt="Buscar" width="23px" height="23px" src="images/find.png">
+                        <a id="getWeatherInfo" alt="Buscar" class="icon-search"></a>
                         <!-- //TODO: Ir añadiendo las localidades consultadas a la lista para facilitar una posible búsqueda futura-->
                         <!-- //TODO: Quizá sería bueno guardar esta información en localStorage-->
                         <datalist id="localidades">
@@ -67,7 +61,14 @@
         <div id="validaciones-container" class="oculto"></div>
 </main>
 <footer>
-
+        <ul id="social">
+          <a href="http://www.twitter.com/babytruckdriver" class="icon-social-twitter">
+            <li class="hide">Twitter</li>
+          </a>
+          <a href="https://github.com/babytruckdriver/" class="icon-social-github">
+            <li class="hide">GitHub</li>
+          </a>
+        </ul>
 </footer>
 
 <script  id="forecast-template" type="text/x-handlebars-template">
@@ -79,7 +80,7 @@
                                 <li>
                                         <img id="imagen" class="imagen-reducida" src="{{imagen}}">
                                 </li>
-                                <li>Temperatura:
+                                <li>Temp:
                                         <span id="temperatura" class="info">{{temperatura}}</span>
                                 </li>
                                 <li>Estado:
@@ -88,7 +89,7 @@
                                 <li>Precipitación:
                                         <span id="precipitacion" class="info">{{precipitacion}}</span>
                                 </li>
-                                <li>Velocidad del viento:
+                                <li>Viento:
                                         <span id="velocidad-viento" class="info">{{velocidadViento}}</span>
                                 </li>
                         </ul>
