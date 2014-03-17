@@ -10,7 +10,7 @@
 
 <body id="weatherNode">
 
-<article>
+<article class="flex-box">
         <section class="encabezado">
                 <h1>
                         <a href="" >
@@ -20,15 +20,13 @@
                 </h1>
                 <h2>(The WeatherNode)</h2>
         </section>
-        <section id="condicionesActuales" class="oculto">
-                <div class="encabezado derecha">
-                        <div class="info oculto">
-                                <span class="localidad-temperatura"></span>
-                                <span class="estado estado-temperatura"></span>
-                                <span class="temperatura temperatura-temperatura"></span>
-                        </div>
+        <section id="condicionesActuales" class="condiciones-actuales oculto">
+                <div class="info oculto">
+                        <span class="localidad-temperatura"></span>
+                        <span class="estado estado-temperatura"></span>
+                        <span class="temperatura temperatura-temperatura"></span>
                 </div>
-                <div class="imagen-presente derecha">
+                <div class="imagen-presente">
                         <img class="imagen-actual" src="">
                 </div>
         </section>
@@ -77,20 +75,20 @@
                 <li class="cabecera">{{cabecera}}</li>
                 <li>
                         <ul>
-                                <li>
+                                <li class="centrado">
                                         <img id="imagen" class="imagen-reducida" src="{{imagen}}">
                                 </li>
                                 <li>Temp:
-                                        <span id="temperatura" class="info">{{temperatura}}</span>
+                                        <span id="temperatura" class="resaltado">{{temperatura}}</span>
                                 </li>
                                 <li>Estado:
-                                        <span id="estado" class="info">{{estado}}</span>
+                                        <span id="estado" class="resaltado">{{estado}}</span>
                                 </li>
                                 <li>Precipitación:
-                                        <span id="precipitacion" class="info">{{precipitacion}}</span>
+                                        <span id="precipitacion" class="resaltado">{{precipitacion}}</span>
                                 </li>
                                 <li>Viento:
-                                        <span id="velocidad-viento" class="info">{{velocidadViento}}</span>
+                                        <span id="velocidad-viento" class="resaltado">{{velocidadViento}}</span>
                                 </li>
                         </ul>
                 </li>

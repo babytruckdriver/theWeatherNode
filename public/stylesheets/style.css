@@ -17,6 +17,7 @@ body {
         margin: 0 auto; /* Centra verticalmente */
 }
 h1 {
+        margin: 10px 0 10px 0;
         font-size: 2em;
 }
 h2 {
@@ -32,7 +33,7 @@ ul {
 }
 
 ul > li {
-        text-align: center;;
+        text-align: left;
 }
 /* Quito los estilos por defecto que pudieran tener los links*/
 
@@ -92,19 +93,16 @@ div#error-container {
         border-radius: 5px;
 }
 .encabezado {
-        width: 200px;
-        /*Las columnas que crea esta clase deben extenderse hasta ocupar el 100% del contenedor*/
-        float: left;
-        /*display: inline-block;*/
-        margin: 0;
-        padding: 2px;
+        width: 40%;
+        order: 1;
 }
 .imagen-presente {
-        float: left;
-        width: 100px;
-        /*display: inline-block;*/
-        margin: 0;
-        padding: 2px;
+        position: relative;
+        float: right;
+        text-align: center;
+        width: 30%;
+        height: 100%;
+        top: 15px;
 }
 .cuerpo {
         clear: both;
@@ -123,7 +121,15 @@ div#error-container {
         clear: both;
 }
 .info {
+        position: relative;
+        float: left;
+        text-align: right;
+        width: 70%;
         font-weight: bold;
+        padding: 0 10px 0 0;
+        /* Este estilo hace que el 'padding' no añada tamaño al alemento (no sumando más del 100%) */
+        -webkit-box-sizing: border-box;
+        box-sizing: border-box;
 }
 .title-detail {
         color: #D7DF01;
@@ -181,6 +187,7 @@ div#error-container {
 .cabecera {
         font-weight: bold;
         padding: 5px;
+        text-align: center;
 }
 .localidad-temperatura {
         font-size: 1em;
@@ -310,3 +317,22 @@ div#error-container {
 }
 
 
+
+.condiciones-actuales {
+        width: 60%;
+        order: 2;
+}
+
+.flex-box {
+        display: flex;
+        flex-direction: row;
+         margin: 0 0 30px 0;
+}
+
+.resaltado {
+        font-weight: bold;
+}
+
+.centrado {
+        text-align: center;
+}
