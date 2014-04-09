@@ -10,7 +10,7 @@
 
 <body id="weatherNode">
 
-<article class="flex-box">
+<article class="flex-box-cabecera">
         <section class="encabezado">
                 <h1>
                         <a href="" >
@@ -51,7 +51,7 @@
                 </section>
         </article>
 
-        <article id="forecast-container" class="oculto">
+        <article id="forecast-container" class="flex-box-resultado oculto">
 
         </article>
 
@@ -78,16 +78,16 @@
                                 <li class="centrado">
                                         <img id="imagen" class="imagen-reducida" src="{{imagen}}">
                                 </li>
-                                <li>Temp:
+                                <li class="text-info">Temp:
                                         <span id="temperatura" class="resaltado">{{temperatura}}</span>
                                 </li>
-                                <li>Estado:
+                                <li class="text-info">Estado:
                                         <span id="estado" class="resaltado">{{estado}}</span>
                                 </li>
-                                <li>Precipitación:
+                                <li class="text-info">Precipitación:
                                         <span id="precipitacion" class="resaltado">{{precipitacion}}</span>
                                 </li>
-                                <li>Viento:
+                                <li class="text-info">Viento:
                                         <span id="velocidad-viento" class="resaltado">{{velocidadViento}}</span>
                                 </li>
                         </ul>

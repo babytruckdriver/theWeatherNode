@@ -13,7 +13,7 @@ body {
         line-height: 1.4em;
         background: #eeeeee;
         color: #333333;
-        width: 520px;
+        max-width: 520px;
         margin: 0 auto; /* Centra verticalmente */
 }
 h1 {
@@ -173,8 +173,6 @@ div#error-container {
 */
 
 .resultado {
-        float: left;
-        width: 25%;
         padding: 5px;
         /* Este estilo hace que el 'padding' no añada tamaño al alemento (no sumando más del 100%) */
         -moz-box-sizing: border-box;
@@ -204,15 +202,6 @@ div#error-container {
         transition: width 0.5s ease-out;
 }
 
-/*@media all and (max-width: 767px) {
-        h1 {
-
-                font-size: 3em;
-
-        }
-
-}*/
-
 #social {
         margin: 5px;
         padding: 5px;
@@ -241,7 +230,6 @@ div#error-container {
         font-weight: normal;
         font-style: normal;
 }
-
 
 [class*="icon-"] {
         background-image: none;
@@ -316,17 +304,20 @@ div#error-container {
         font-size: 3em;
 }
 
-
-
 .condiciones-actuales {
         width: 60%;
         order: 2;
 }
 
-.flex-box {
+.flex-box-cabecera {
         display: flex;
         flex-direction: row;
          margin: 0 0 30px 0;
+}
+
+.flex-box-resultado {
+        display: flex;
+        flex-direction: row;
 }
 
 .resaltado {
@@ -335,4 +326,16 @@ div#error-container {
 
 .centrado {
         text-align: center;
+}
+
+@media all and (max-width: 300px) {
+        [class*="flex-box"] {
+                flex-direction: column;
+        }
+}
+
+@media all and (max-width: 520px) {
+        [class="text-info"] {
+                text-align: center;
+        }
 }
