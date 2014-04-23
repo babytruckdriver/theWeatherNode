@@ -38,18 +38,23 @@ if ('development' == app.get('env')) {
 
 // Métodos y objetos de uso común
 
+var Data = function () {
+        this.format = "";
+        this.q = "";
+        this.num_of_days = 0;
+};
 
 //Función que serializa los atributos de 'this' en formato 'queryString' ( &nomAttr=valor&... ).
 //Uso:  -Ejecutar la función 'app.stringify'haciendo 'apply' y pasándole el "this" sobre el que actuar (un objeto con datos): app.stringify.apply(data)
-//      -También se puede asociar la función 'stringify' de 'app' al objeto que necesite hacer uso de ella: data.stringify = app.stringify -> data.stringify()
-app.stringify = function () {
+//      -También se puede asociar la función 'stringify' de 'app' al objeto que necesite hacer uso de ella: data.prototype.stringify = app.stringify -> data.stringify()
+Data.prototype.stringify = function () {
         var name, result = "";
-        //La función acepta 'this' con funciones, pero no las tiene en cuenta
-        for (name in this) {
-                if (typeof this[name] !== "function" && this.hasOwnProperty(name)) {
+        //La función acepta 'this' con métodos ("function"), pero no los tiene en cuenta
+        Object.getOwnPropertyNames(this).forEach( function (name) {
+                if(typeof this[name] !== "function") {
                         result += "&" + name + "=" + this[name];
                 }
-        }
+        }, this);
         return result;
 };
 
@@ -72,13 +77,10 @@ app.get('/forecast.:formato?', function (req, res) {
         var key = "4g6yp8teksrqzy6rfykh6c24";
 
         //Datos de entrada de la petición agrupados en un objeto
-        var data = {
-                format: req.param("formato"),
-                q: encodeURIComponent(req.param("localidad")), //Codificación de los espcios: %20. Ej: San%20Fernando%20de%20henares
-                num_of_days: req.param("numDias")
-        };
-        //Añadimos al objeto 'data' la función 'app.stringify' que trabaja sobre 'this'
-        data.stringify = app.stringify;
+        var data  = new Data();
+        data.format = req.param("formato");
+        data.q = encodeURIComponent(req.param("localidad")); //Codificación de los espcios: %20. Ej: San%20Fernando%20de%20henares
+        data.num_of_days = req.param("numDias");
 
         //Configurando el enPoint
         var endPoint = url + "?key=" + key;
