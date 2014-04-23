@@ -12,3 +12,8 @@ Installation:
 Execution:
 
     $ node app
+
+Note:
+-----
+
+I have built a stand-alone version of the Webapp (without Node.js). Just HTML, CSS & Javascript (and JSON-P).
