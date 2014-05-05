@@ -7,7 +7,7 @@ require.config({
                 jquery: "vendor/jquery-2.1.0",
                 handlebars: "vendor/handlebars-v1.3.0"
         },
-        shim: {
+        shim: { //Se configuran los módulos no AMD
                 handlebars: {
                         exports: "Handlebars"
                 }
