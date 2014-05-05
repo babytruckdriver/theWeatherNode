@@ -31,7 +31,7 @@ app.use(app.router);
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only
-if ('development' == app.get('env')) {
+if ('development' === app.get('env')) {
         app.use(express.errorHandler());
 }
 
@@ -49,8 +49,8 @@ var Data = function () {
 Data.prototype.stringify = function () {
         var name, result = "";
         //La función acepta 'this' con métodos ("function"), pero no los tiene en cuenta
-        Object.getOwnPropertyNames(this).forEach( function (name) {
-                if(typeof this[name] !== "function") {
+        Object.getOwnPropertyNames(this).forEach(function (name) {
+                if (typeof this[name] !== "function") {
                         result += "&" + name + "=" + this[name];
                 }
         }, this);
