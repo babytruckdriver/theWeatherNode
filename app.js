@@ -36,8 +36,9 @@ if ('development' == app.get('env')) {
 }
 
 
-// Métodos y objetos de uso común
+//= Métodos y objetos de uso común =//
 
+//Factoría para crear objetos de datos
 var Data = function () {
         this.format = "";
         this.q = "";
@@ -45,8 +46,6 @@ var Data = function () {
 };
 
 //Función que serializa los atributos de 'this' en formato 'queryString' ( &nomAttr=valor&... ).
-//Uso:  -Ejecutar la función 'app.stringify'haciendo 'apply' y pasándole el "this" sobre el que actuar (un objeto con datos): app.stringify.apply(data)
-//      -También se puede asociar la función 'stringify' de 'app' al objeto que necesite hacer uso de ella: data.prototype.stringify = app.stringify -> data.stringify()
 Data.prototype.stringify = function () {
         var name, result = "";
         //La función acepta 'this' con métodos ("function"), pero no los tiene en cuenta
