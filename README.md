@@ -7,7 +7,7 @@ Installation and execution instructions:
 ------------------------------------------
 Installation:
 
-    $ node install
+    $ npm install
 
 Execution:
 
