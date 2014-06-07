@@ -17,4 +17,4 @@ Note:
 -----
 
 I have built a stand-alone version of the Webapp (without Node.js). Just HTML, CSS & Javascript (and JSON-P).
-This is the repo: 
+This is the [repo](https://github.com/babytruckdriver/foxyWeather). 
